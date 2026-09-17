@@ -1,0 +1,96 @@
+# Gate 4 (docs/02_validation_gates.md): FROZEN band values for
+# src/gates/gate4_bab.py's mean_return_band / sharpe_band /
+# market_loading_band / loading_diff_band and the two EXPECTED_* pins.
+#
+# CRITICAL DESIGN POINT, found during this session's own injection testing
+# (docs/02_validation_gates.md's Gate 4 section has the full account): a
+# band function that recomputes "1.5 * measured_gap" from whatever result
+# dict it is HANDED is tautologically self-satisfying -- inject a x100
+# scale error and its own gap term inflates the band to match, so the
+# assertion never fires. Verified directly: a live-recomputed
+# mean_return_band and market_loading_band both PASSED under a x100
+# injection that should have failed loudly.
+#
+# Fix: every band below is a FROZEN NUMBER, computed ONCE from the real
+# 1970-2025 baseline measurement and pinned here, exactly like
+# EXPECTED_N_DATES_1970_2025 below. A band function takes `result` only
+# so its signature matches the test call sites
+# (`gate4_bab.mean_return_band(result)`); it does not read anything
+# defect-sensitive OUT of `result` to compute the band itself -- the
+# threshold this run is judged against must not move with the run being
+# judged, or an assertion "capable of catching an error" degenerates into
+# one that widens its own goalposts around the error (CLAUDE.md: "never
+# mark a validation gate PASS without first demonstrating that its check
+# is able to fail" -- a self-referential band cannot fail by construction).
+#
+# All values measured 2026-09-13 against the real 599-month comparison
+# frame (_scratch/gate4_full_comparison.parquet, verified to reproduce the
+# committed numbers exactly). Re-derive these (not the formula shape) if a
+# legitimate future change (a universe refinement, a delisting-merge fix)
+# produces a different baseline -- see docs/02_validation_gates.md.
+
+bands:
+  # max(2 * SE_diff, 1.5 * measured_gap), evaluated ONCE at baseline.
+  # SE_diff = std(per-month ours-minus-aqr diff, ddof=1) / sqrt(599) =
+  # 0.00046573. measured_gap = |0.0064120 - 0.0071772| = 0.00076522.
+  # 2*SE_diff=0.00093146, 1.5*gap=0.00114784 -> frozen band 0.00114784.
+  mean_return:
+    frozen_value: 0.00114784
+
+  # max(0.15, 1.5 * measured_gap), evaluated ONCE at baseline.
+  # measured_gap = |0.70445 - 0.73490| = 0.03046 -> 1.5x = 0.04568, under
+  # the floor -- the floor is load-bearing (a Sharpe gap this small
+  # carries real sampling noise at n=599; 0.15 is deliberately generous
+  # per the plan's own design, not backed into from the baseline).
+  sharpe:
+    frozen_value: 0.15
+
+  # max(0.10, 1.5 * |measured_loading_ours|), evaluated ONCE at baseline.
+  # |loading_ours| = 0.07718 -> 1.5x = 0.11577 -> frozen band 0.11577.
+  # Bounds the MAGNITUDE of our own loading (catches a gross
+  # neutralization break, e.g. long-only). Separate from loading_diff
+  # below, which is the real external-anchor comparison.
+  market_loading_magnitude:
+    frozen_value: 0.11577
+
+  # max(2 * SE_diff_beta, 1.5 * |measured_diff|), evaluated ONCE at
+  # baseline, where diff = (ours - aqr) regressed on the market.
+  # Replaces the original |t_stat_ours| < 2.0 bar, which rejected AQR's
+  # own published factor (t=-2.165) and FP's published -0.06 evaluated at
+  # our SE (t=-2.17) -- see docs/02_validation_gates.md's Gate 4 section.
+  # Measured diff -0.01267, SE_diff_beta 0.010066 -> 2*SE=0.020132,
+  # 1.5*diff=0.018998 -> frozen band 0.020132.
+  loading_diff:
+    frozen_value: 0.020132
+
+# t-stat bar for the (ours - aqr) difference regression -- unlike the
+# retired |t_stat_ours| < 2.0 bar, this tests whether OUR loading differs
+# significantly from the BENCHMARK's own loading, not whether either is
+# significantly different from zero. Measured t_diff = -1.258, well
+# inside 2.0.
+#
+# CORRECTION (gate-verifier, 2026-09-13): an earlier version of this
+# comment claimed a t-stat is inherently scale-robust ("a scale injection
+# cannot inflate a t-stat's own denominator to match its numerator") --
+# gate-verifier traced the actual OLS math and found this FALSE for this
+# specific bound. Measured directly: scaling `ours` alone by k does not
+# make |t_diff| diverge -- it SATURATES at ~2.786 (the t-stat of `ours`
+# alone) as k grows, barely past this 2.0 bar. And scaling BOTH `ours`
+# and `aqr` uniformly, or adding a uniform bias to `ours`, leaves t_diff
+# EXACTLY invariant (numerator and denominator scale identically) -- the
+# same location/scale-invariance class CLAUDE.md already warns
+# correlation is blind to. This bound is a REDUNDANT secondary check
+# riding on loading_diff's frozen band above, not an independently
+# scale-robust statistic in its own right. If loading_diff's frozen band
+# is ever removed on the reasoning that this t-bound already covers the
+# same ground, that removal would silently reopen the goalpost-inflation
+# gap this session closed -- keep both.
+loading_diff_t_bound: 2.0
+
+# Exact pins, full 1970-01-01 to 2025-12-31 formation window. Measured
+# 2026-09-13 against build_bab_series/run_gate4_us's real output (see
+# _gate4_full.txt / docs/worklog.md). 599 held months + 73 missing-coverage
+# skips = 672 candidate formation dates exactly -- the two pins are
+# mutually reinforcing, not independent guesses.
+expected_n_dates_1970_2025: 599
+expected_n_skips_1970_2025: 73

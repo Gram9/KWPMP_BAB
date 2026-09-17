@@ -1,0 +1,179 @@
+# Universe construction constants. See docs/00_spec.md §3 for derivation and
+# docs/01_data_notes.md for field semantics.
+
+# Major-exchange filter. Endowment mandate cannot trade OTC names (spec §11
+# item 9). exchg=19 (Other-OTC) alone is 51% of the raw US priusa universe
+# (2015-06 test month) -- larger than NASDAQ+NYSE combined. Verified against
+# comp.r_ex_codes: 11=NYSE, 12=NYSE MKT (formerly AMEX), 14=NASDAQ. Excludes
+# 19 (Other-OTC), 13 (OTC Bulletin Board), 1 (non-traded), and five singleton
+# codes (17/21/15/16/18 -- NYSE Arca, BATS, NASDAQ OMX BX/PHLX, Midwest) that
+# had exactly 1 name each in the test month, consistent with secondary/
+# duplicate listing markers rather than genuine primary residents.
+us_major_exchanges: [11, 12, 14]
+
+us_reit_mlp_exclusion:
+  # REIT: comp.company.sic exact match. Verified zero false negatives against
+  # all 10 known REITs in the Open Item 3 diff (spec §3).
+  reit_sic: "6798"
+
+  # MLP: no single clean field. Union of GICS sub-industry (NOT gind — gind is
+  # one level up and catches ordinary E&P/refining C-corps) and an LP-suffix
+  # name regex, anchored to the end of the name so it doesn't match ordinary
+  # C-corps with "Partners" in their brand (e.g. Artisan Partners Asset Mgmt).
+  mlp_gsubind: "10102040"  # "Oil & Gas Storage & Transportation"
+  mlp_name_regex: '[\s\-,]L\.?P\.?$'
+
+# Canadian exchange grid cells (spec §11 Open Item #1). TSXV inclusion is an
+# open empirical question, not resolved here -- both cells are constructed
+# so the comparison can be made in Phase 4. exchg codes verified against
+# comp.r_ex_codes and docs/01_data_notes.md §3 (7=TSX, 9=TSX Venture).
+canada_exchange_sets:
+  tsx_only: [7]
+  tsx_and_tsxv: [7, 9]
+
+can_reit_mlp_trust_exclusion:
+  # Derived empirically from data/raw/can_reference_2015_06.parquet
+  # (docs/01_data_notes.md §11) -- NOT ported from us_reit_mlp_exclusion
+  # unchecked. Two of the three US-side signals do not transfer to Canada:
+  #
+  #   - gsubind='10102040' (US MLP GICS code) was tested and REJECTED: on
+  #     the Canadian panel it matches Enbridge, TC Energy, Pembina Pipeline,
+  #     Keyera, and Gibson Energy -- Canada's actual pipeline C-corp
+  #     megacaps, not MLPs. Canada does not use the US MLP legal structure
+  #     the same way, so GICS sub-industry does not discriminate entity
+  #     structure here. Not included below.
+  #   - a bare TRUST or FUND name regex was tested and REJECTED: even after
+  #     excluding the closed-end-fund SIC codes (6199, 6726), it still
+  #     matches genuine non-trust operating companies (Western Pacific Trust
+  #     Company -- a licensed fiduciary/trust-services firm, SIC 6200; and
+  #     Goodman Gold Trust -- a closed-end mutual fund misfiled under a
+  #     mining SIC). Same class of false-positive as the US "bare PARTNERS"
+  #     trap. Not included below.
+  #   - a ".UN$"/" UN$" ticker-suffix pattern (the real-world TSX income-
+  #     trust unit convention, e.g. REI.UN) was tested and produced ZERO
+  #     matches: Compustat's comp.company.conm field does not carry the
+  #     ".UN" ticker suffix in the company name. Confirmed by web search on
+  #     Restaurant Brands Intl LP -- its real ticker is QSP.UN, but conm is
+  #     just "RESTAURANT BRANDS INTL LP". Not included below.
+
+  # REIT: comp.company.sic exact match, same field/value as the US rule.
+  # 43 names on the 2015-06 Canadian panel, zero false positives -- every
+  # matched name is a real, web-confirmed REIT/real-estate trust (RioCan,
+  # SmartCentres/Calloway, Boardwalk, Dream family, etc).
+  reit_sic: "6798"
+
+  # LP-suffix name regex: same anchored pattern as the US rule (ends in an
+  # LP designation, not a bare "PARTNERS"/"LP" substring). Matches 3 names
+  # on the raw panel; 2 already overlap reit_sic. The one incremental catch
+  # is Restaurant Brands International LP (RBI's Ontario limited
+  # partnership holding Tim Hortons/Burger King, TSX ticker QSP.UN,
+  # web-confirmed genuine LP, ~$12.0B implied market cap in 2015-06 --
+  # plausible and independently corroborated).
+  #
+  # Note: this pattern must ALSO exclude sic in
+  # mlp_name_fund_sic_exclusions below, or it catches Mackenzie Master LP
+  # (gvkey 107327, sic=6199) -- a captive fee-collection vehicle for
+  # Mackenzie mutual funds, not an operating LP. Confirmed by web search:
+  # it invests solely in a Mackenzie money-market fund and issues no new
+  # units. Excluding sic 6199/6726 (the closed-end-fund/investment-office
+  # codes, same codes identified above) removes this false positive while
+  # keeping all 3 genuine matches.
+  mlp_name_regex: '[\s\-,]L\.?P\.?$'
+  mlp_name_fund_sic_exclusions: ["6199", "6726"]
+
+  # Income-trust names surfaced in the diagnosis (Argent Energy Trust,
+  # Parallel Energy Trust -- both sic=1311, web-confirmed genuine post-2011
+  # SIFT-loophole energy income trusts holding US assets) are NOT excluded
+  # by this rule. No clean field discriminates them from the TRUST/FUND
+  # false positives above. Whether/when income trusts should be excluded at
+  # all (pre-2006 vs. post-2011 Canadian trust-taxation regimes) is spec
+  # §11 Open Item #2 -- genuinely open, not resolved by this task.
+
+# CHASS (CFMRC) domestic-only base filter. Symmetric with the US side's
+# usincflg='Y' rule below (us_crsp_primary): each country's universe is
+# that country's own domiciled firms, not everything cross-listed on its
+# exchange. foreign_flag-Foreign Flag is populated directly by CHASS
+# (not derived) -- 792,132 of 807,453 monthly rows are "Domestic Firm",
+# the remaining 15,321 "Foreign Firm" (foreign-domiciled companies
+# cross-listed on TSX, e.g. American Express) are excluded here.
+chass_domestic_only:
+  foreign_flag_value: "Domestic Firm"
+
+# CHASS (CFMRC) Canadian ETF/mutual-fund/REIT/MLP exclusion. Values
+# verified empirically against the full monthly file
+# (data/raw/CHASS_Data/parquet/monthly.parquet, 807,453 rows / 7,537
+# distinct (symbol-Ticker, usage-Usage Number) names) this session.
+#
+# Three business-Business categories are clean and safe to exclude
+# wholesale -- every sampled name in each is a genuine fund/REIT/MLP
+# product:
+#   - INVESTMENT FUND (158,397 rows): ETFs, mutual funds, income funds.
+#   - INVESTMENT TRUST (30,609 rows): REITs and closed-end trusts.
+#   - LIMITED PARTNERSHIP (1,171 rows): genuine MLPs (Brookfield
+#     Renewable/Infrastructure/Property Partners, Restaurant Brands
+#     International LP, Pure Multi-Family REIT LP).
+#
+# REAL ESTATE (11,766 rows) was tested and REJECTED as a fourth clean
+# category: it is operating real-estate companies (Brookfield Office
+# Properties, Trizec, Genesis Land Development), not REITs -- the same
+# "sector classification catches non-REIT operating companies" trap
+# already documented above for CRSP's icbindustry. Not excluded.
+#
+# foreign_flag-Foreign Flag was tested and REJECTED as a discriminator
+# for the three contaminated categories below: it is domestic/foreign
+# incorporation (~99.9% "Domestic Firm" in every category examined),
+# uncorrelated with fund-vs-operating-company status.
+chass_fund_mlp_reit_exclusion:
+  clean_exclude_categories: ["INVESTMENT FUND", "INVESTMENT TRUST", "LIMITED PARTNERSHIP"]
+
+  # MUTUAL FUNDS, INVESTMENT COMPANY, and TRUST FUND are genuinely
+  # contaminated: real operating companies and genuine fund products
+  # share the same TSX business label, with no field or name regex
+  # that reliably separates them (tested "SPLIT" and CAPITAL SHARES/
+  # UNITS suffix heuristics -- both leave large real companies, e.g.
+  # Pembina Pipeline, Algonquin Power & Utilities, Franco-Nevada,
+  # Keyera, on both sides). All 239 distinct names across these three
+  # categories were hand-classified this session; see
+  # config/chass_fund_classification.csv (columns: symbol,
+  # usage_number, name, business, classification, confidence,
+  # reasoning). classification is one of FUND_PRODUCT (excluded),
+  # REAL_COMPANY (kept), or UNKNOWN (kept for now -- confidence too low
+  # to classify, mostly obscure microcaps expected to be removed by a
+  # later market-cap filter regardless; not a resolved fund-status
+  # decision, and must not be silently treated as one).
+  contaminated_categories: ["MUTUAL FUNDS", "INVESTMENT COMPANY", "TRUST FUND"]
+  classification_csv: "config/chass_fund_classification.csv"
+
+# CRSP-primary US universe (docs/superpowers/specs/2026-09-03-us-full-
+# history-panel-crsp-primary-design.md). Values verified empirically
+# against live WRDS crsp.wrds_dsfv2_query, 2015-06-30 test date -- see
+# that design doc's "Findings" section for the underlying evidence.
+us_crsp_primary:
+  # Base membership rule: ordinary US-incorporated common equity.
+  # usincflg='Y' reproduces CRSP shrcd IN (10,11) exactly (verified
+  # 3,824/3,824 and 514/514 zero-overlap split against legacy
+  # crsp.stocknames.shrcd) -- resolves spec open item #3.
+  securitytype: "EQTY"
+  securitysubtype: "COM"
+  sharetype: "NS"
+  usincflg: "Y"
+
+  # Major-exchange filter: NASDAQ (Q) / NYSE (N) / AMEX (A). Excludes
+  # 'X' (confirmed dead/inactive: securityactiveflg='N', null price) and
+  # 'R' (confirmed non-primary/secondary listing).
+  us_major_exchanges_crsp: ["Q", "N", "A"]
+
+  # REIT exclusion signal: issuertype, NOT icbindustry. Both agree on the
+  # project's 9 known REITs, but disagree on 74 names in a structurally
+  # meaningful way -- issuertype correctly separates mortgage REITs
+  # (issuertype=REIT, icbindustry=FINL) from real-estate-adjacent non-
+  # REIT operating companies (CBRE, Zillow, Realogy: icbindustry=REIT,
+  # issuertype=CORP). icbindustry is a sector/exposure classification;
+  # issuertype is the legal-structure signal this exclusion needs.
+  reit_issuertype: "REIT"
+
+  # Window start. crsp.wrds_dsfv2_query covers back to 1925 -- no
+  # truncation risk at this boundary. Sized to cover all three spec
+  # sample periods (common 1977-present, US max ~1965-present,
+  # out-of-sample 2013-present) as subsets.
+  window_start: "1965-01-01"

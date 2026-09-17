@@ -1,0 +1,15 @@
+# AQR "Betting Against Beta" published factor workbook. See
+# docs/02_validation_gates.md Gate 4 ("Benchmark data") for full derivation
+# and the verification anchors this loader's tests assert against.
+#
+# Values on this sheet are already DECIMAL returns -- do not divide by 100.
+
+path: "data/raw/AQR_BAB_Historical/Betting Against Beta Equity Factors Monthly.xlsx"
+cache_path: "data/raw/aqr_bab_factors.parquet"
+sheet: "BAB Factors"
+header_row: 19       # 1-indexed worksheet row; data starts at row 20
+date_column: "A"
+columns:
+  usa: "Y"
+  can: "E"
+units: decimal

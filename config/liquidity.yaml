@@ -1,0 +1,41 @@
+# Liquidity filter -- spec 00_spec.md section 3: "a filter on estimation-
+# window quality, not universe membership: minimum count of non-zero-volume
+# days within the vol window." Two independent rules, both real observed
+# failure modes (docs/01_data_notes.md section 6):
+#
+#   - min_nonzero_volume_days: Lehman printed a frozen $0.55 with
+#     cshtrd=0/volume=0 for 15 straight days in 2014 -- a stale quote has
+#     zero realized variance, understating sigma_i and pushing a defunct
+#     shell into the LOW-beta long leg.
+#   - min_price: Circuit City traded GENUINELY (nonzero volume) at
+#     $0.0021-$0.0035 during wind-down, where a one-tick move is a ~40%
+#     "return" -- the opposite failure mode, inflating sigma_i and pushing
+#     the name into the HIGH-beta short leg.
+#
+# CLAUDE.md: no magic numbers in src/ -- both thresholds live here, read by
+# src/portfolio/liquidity.py.
+
+# Composes with config/beta_estimator.yaml's sigma_min_obs as a SECOND,
+# INDEPENDENT gate over the SAME sigma window (sigma_window_days=252) --
+# same two-gate inner-join shape src/estimation/beta_fp.py's
+# _estimate_beta_fp_core already uses for its sigma/rho gates. A name needs
+# BOTH n_obs >= sigma_min_obs AND n_nonzero_volume >= min_nonzero_volume_days
+# to be estimable; failing either excludes the name entirely, never a
+# partial/null row. Deliberately NOT a replacement for sigma_min_obs and NOT
+# a pre-filter that drops zero-volume rows before counting (either of those
+# would silently change what sigma_i is measured over, moving Gate 3's
+# already-pinned numbers) -- this is a second, independent count gate.
+min_nonzero_volume_days: 120
+
+# Sub-penny exclusion: a name whose LAGGED close at the formation date is
+# below this floor (local currency -- USD us / CAD canada, spec section 4)
+# is excluded from that month's universe. Evaluated cross-sectionally at t
+# from data available at t (CLAUDE.md); never pooled over the full panel. A
+# name may exit and later re-enter if its price recovers above the floor.
+min_price: 1.00
+
+# Required diagnostic (spec section 6): log the count and characteristics of
+# names excluded by either rule each month. Recent IPOs and wind-downs are
+# systematically high-beta/high-vol or low-beta/stale respectively, so this
+# exclusion mechanically thins both tails -- the count must be visible, not
+# silent.

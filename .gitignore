@@ -1,0 +1,56 @@
+# ---- Data: never commit. Large, licensed, and re-pullable from WRDS. ----
+# Anchored to repo root -- do NOT use a bare "data/" here, it would also
+# match src/data/ (a real source package, not the cache directory).
+/data/
+!/data/.gitkeep
+
+# Cached WRDS pulls dropped in repo root during ad hoc diagnosis (should live
+# under data/raw/ going forward, but these predate that convention).
+/comp_priusa_*.csv
+/crsp_shrcd_*.csv
+/mlp_reit_excluded_*.csv
+
+# ---- Credentials ----
+.env
+.env.*
+.pgpass
+*.pgpass
+secrets/
+**/wrds_credentials*
+
+# ---- Claude Code: commit settings.json + skills + agents, not local overrides ----
+.claude/settings.local.json
+
+# ---- Python ----
+.venv/
+.venv-*/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# ---- Jupyter ----
+.ipynb_checkpoints/
+
+# ---- Generated outputs: regenerable by `make report`, so not source ----
+output/
+figures/
+tables/
+*.parquet
+*.feather
+
+# ---- Windows / OneDrive noise ----
+Thumbs.db
+desktop.ini
+~$*
+*.tmp
+
+# ---- Editor ----
+.vscode/
+.idea/

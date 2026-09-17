@@ -1,0 +1,17 @@
+# .venv-wrds requirements -- NOT .venv (see run.py / CLAUDE.md: .venv lacks
+# yaml/polars/pandas). Install with:
+#   .venv-wrds/Scripts/python.exe -m pip install -r requirements.txt
+#
+# Derived from actual `import` statements across src/, tests/, run.py --
+# no pinned versions recorded anywhere else in this repo to carry forward.
+
+wrds          # WRDS Postgres connection; pulls in psycopg2-binary + sqlalchemy
+polars
+pandas
+numpy
+pyarrow
+openpyxl      # AQR BAB Historical .xlsx parsing
+PyYAML        # config/*.yaml loaders
+pytest
+ruff          # python run.py lint
+mypy          # python run.py typecheck

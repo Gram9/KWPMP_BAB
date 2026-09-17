@@ -1,0 +1,62 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python run.py test*)",
+      "Bash(python run.py unit*)",
+      "Bash(python run.py leakage*)",
+      "Bash(python run.py lint*)",
+      "Bash(python run.py typecheck*)",
+      "Bash(python run.py help*)",
+      "Bash(.venv-wrds/Scripts/python.exe -m pytest *)",
+      "Bash(.venv-wrds/Scripts/python.exe -m ruff *)",
+      "Bash(.venv-wrds/Scripts/python.exe -m mypy *)",
+      "Bash(pytest *)",
+      "Bash(ruff *)",
+      "Bash(mypy *)",
+      "Bash(git status)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git add *)",
+      "Bash(git commit *)"
+    ],
+    "ask": [
+      "Bash(git push *)",
+      "Bash(python run.py gates*)",
+      "Bash(python run.py check*)"
+    ],
+    "deny": [
+      "Read(.env)",
+      "Read(**/.pgpass)",
+      "Read(**/secrets/**)",
+      "Write(data/raw/**)",
+      "Edit(data/raw/**)",
+      "Write(data/raw.old/**)",
+      "Edit(data/raw.old/**)",
+      "Bash(rm -rf *)"
+    ]
+  },
+
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".venv-wrds/Scripts/python.exe -m ruff check --fix src/ tests/ 2>&1 | tail -20"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".venv-wrds/Scripts/python.exe -m pytest tests/leakage/ -q 2>&1 | tail -15"
+          }
+        ]
+      }
+    ]
+  }
+}

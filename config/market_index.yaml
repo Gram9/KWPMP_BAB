@@ -1,0 +1,57 @@
+# Market index variants — spec §7. Every run in config/runs.yaml names one
+# of these via `market_index:`; src/market_index/build.py is the only code
+# that reads this file.
+#
+# All three variants consume the SAME common-schema panel
+# (src/data/gate_adapters.py: id, date, mkt_cap, ret — mkt_cap already
+# LAGGED prior-day-close x shares). Capping/coverage cutoffs are computed
+# cross-sectionally at each date from that lagged mkt_cap — never pooled
+# over the full panel (CLAUDE.md).
+#
+# NO MAGIC NUMBERS IN src/: the 10% cap, its iteration guard, and the 85%
+# coverage target all live here, not hardcoded in build.py.
+
+indices:
+
+  # Uncapped value-weighted — spec §7's baseline construction. This is
+  # gate1_index.build_vw_index() UNCHANGED (Gate-1-validated code, wired
+  # not rewritten) — kind: uncapped is a thin pass-through.
+  vw_uncapped:
+    kind: uncapped
+
+  # Capped VW, 10% single-name limit. Required for Canada: Nortel reached
+  # ~28% of the self-built Canadian index on 2000-07-27 (verified directly
+  # against the panel — spec's "roughly a third" claim, contaminating every
+  # Canadian beta estimated on a 5y correlation window from ~1997-2006).
+  #
+  # Water-filling algorithm: any name's raw weight above `cap` is clipped to
+  # exactly `cap`; the excess is redistributed pro-rata (proportional to
+  # current weight) across all currently-uncapped names; repeat until no
+  # name exceeds `cap`. max_iterations is a convergence guard, not a tuning
+  # knob — with a 10% cap, convergence requires at most floor(1/cap) - 1
+  # passes (each pass permanently caps at least one more name), so 50 is
+  # slack, not a load-bearing choice.
+  vw_capped_10pct:
+    kind: capped
+    cap: 0.10
+    max_iterations: 50
+
+  # MSCI-Canada-like large-cap proxy — spec §7's third variant, reproducing
+  # what FP actually did internationally (MSCI local indices, large/mid-cap
+  # only) rather than what they did for the US (CRSP VW, spans the universe).
+  #
+  # Real MSCI methodology targets ~85% cumulative FREE-FLOAT market cap
+  # coverage per country. This project has no free-float data anywhere
+  # (spec §7: "total shares not free float" is the project-wide convention),
+  # so this proxy targets the same 85% cumulative-coverage RULE on TOTAL
+  # market cap instead — a coverage target, not a free-float replica.
+  #
+  # At each date: rank names by (lagged) mkt_cap descending, keep names
+  # until cumulative raw weight >= target_cumulative_weight, VW over that
+  # kept subset only with weights renormalized to sum to 1 over the subset.
+  # Recomputed cross-sectionally at every date — the kept-name set is not
+  # fixed over time, matching MSCI's own periodic-reconstitution intent
+  # without requiring this project to model reconstitution dates.
+  vw_msci_like:
+    kind: coverage_cutoff
+    target_cumulative_weight: 0.85

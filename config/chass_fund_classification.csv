@@ -1,0 +1,240 @@
+symbol,usage_number,name,business,classification,confidence,reasoning
+FBS.A,0,5BANC SPLIT INC. CL 'A' CAPITAL SHARES,INVESTMENT COMPANY,FUND_PRODUCT,high,"SPLIT in name, bank-focused split-share corp"
+FBS.B,0,5BANC SPLIT INC. CL 'B' CAPITAL,INVESTMENT COMPANY,FUND_PRODUCT,high,SPLIT in name
+AAB,0,ABERDEEN INTERNATIONAL INC. J,INVESTMENT COMPANY,REAL_COMPANY,medium,"Aberdeen International is a real TSX-listed resource-focused merchant bank / operating investment company, not a pooled fund product"
+FAP,0,ABRDN ASIA-PACIFIC INCOME FUND VCC ORDINARY,INVESTMENT COMPANY,FUND_PRODUCT,high,"literal FUND in name, VCC (variable capital company) is a fund wrapper"
+ASF,0,ACUITY SMALL CAP CORPORATION CLASS 'A',INVESTMENT COMPANY,FUND_PRODUCT,medium,Acuity was a Canadian fund manager brand; this share-class structure matches its closed-end fund family naming
+AFN,1,AG GROWTH INTERNATIONAL INC.,INVESTMENT COMPANY,REAL_COMPANY,high,"AG Growth International is a real, well-known Canadian agricultural equipment manufacturer -- no fund characteristics at all, clear business-classification miss"
+ADC,1,AIC DIVERSIFIED CANADA SPLIT CORP. CAPITAL,INVESTMENT COMPANY,FUND_PRODUCT,high,SPLIT in name
+ASC,0,AIC GLOBAL FINANCIAL SPLIT CORP. CL 'A',INVESTMENT COMPANY,FUND_PRODUCT,high,SPLIT in name
+AQN,0,ALGONQUIN POWER & UTILITIES CORP.,INVESTMENT COMPANY,REAL_COMPANY,high,"Algonquin Power & Utilities is a large, real, well-known TSX/NYSE-listed utility and renewable power operating company -- clear business-classification miss, largest name found in this whole contaminated set by shares outstanding"
+ABK,0,ALLBANC SPLIT CORP. CAPITAL SHARES,INVESTMENT COMPANY,FUND_PRODUCT,high,SPLIT in name
+ABK.A,0,ALLBANC SPLIT CORP. CL 'A' CAPITAL SHARES,INVESTMENT COMPANY,FUND_PRODUCT,high,SPLIT in name
+ALB,0,ALLBANC SPLIT CORP. II CLASS 'A' CAPITAL,INVESTMENT COMPANY,FUND_PRODUCT,high,SPLIT in name
+ARR,0,ALTIUS RENEWABLE ROYALTIES CORP. J,INVESTMENT COMPANY,REAL_COMPANY,medium,"Altius Renewable Royalties is a real, currently-listed TSX royalty operating company (spun out of Altius Minerals), not a pooled vehicle -- same class as Franco-Nevada/Freehold"
+GUR,1,ASTON HILL GLOBAL URANIUM FUND INC. EQUITY,INVESTMENT COMPANY,FUND_PRODUCT,high,literal FUND in name
+GPC,0,ASTON HILL SR GOLD PRODUCERS INCM CORP. CL A,INVESTMENT COMPANY,FUND_PRODUCT,medium,Aston Hill is a Canadian closed-end fund sponsor brand; INCM CORP share-class structure matches its fund family naming
+AI,0,ATRIUM MORTGAGE INVESTMENT CORPORATION,INVESTMENT COMPANY,FUND_PRODUCT,high,"user decision: mortgage investment corporations (MICs) excluded as fund-like pooled mortgage capital, applied uniformly across the MIC group (AI/ERM/FNC/RF.A/SMC.M/TF/MTG/TZZ) for consistency"
+BXN,0,B SPLIT II CORP. CL 'A' CAPITAL,INVESTMENT COMPANY,FUND_PRODUCT,high,SPLIT in name
+BCX.A,0,BCX SPLIT CORP. CL 'A' CAPITAL,INVESTMENT COMPANY,FUND_PRODUCT,high,SPLIT in name
+BIG.A,0,BIG 8 SPLIT INC. CL 'A' CAPITAL,INVESTMENT COMPANY,FUND_PRODUCT,high,SPLIT in name
+BBO,1,BIG BANK BIG OIL SPLIT CORP. CL 'A' CAPITAL,INVESTMENT COMPANY,FUND_PRODUCT,high,SPLIT in name
+BMT,0,BMONT SPLIT CORP. CLASS 'A' CAPITAL,INVESTMENT COMPANY,FUND_PRODUCT,high,SPLIT in name
+BSN,0,BNS SPLIT CORP. CL 'A' CAPITAL,INVESTMENT COMPANY,FUND_PRODUCT,high,SPLIT in name
+BSC,0,BNS SPLIT CORP. II CLASS A CAPITAL,INVESTMENT COMPANY,FUND_PRODUCT,high,SPLIT in name
+XBN,0,BNT LIMITED CAPITAL SHARES,INVESTMENT COMPANY,FUND_PRODUCT,high,CAPITAL SHARES / EQUITY DIVIDEND paired share-class structure is the split-corp tell even without SPLIT in the name (matches XBN.E below)
+XBN.E,0,BNT LIMITED EQUITY DIVIDEND,INVESTMENT COMPANY,FUND_PRODUCT,high,paired with XBN CAPITAL SHARES -- split-corp share-class pair
+ESP,2,BROMPTON ENERGY SPLIT CORP. CL A,INVESTMENT COMPANY,FUND_PRODUCT,high,"SPLIT in name, Brompton is a known Canadian split-share fund sponsor"
+BE,0,BROMPTON EQUITY SPLIT CORP. CL 'A',INVESTMENT COMPANY,FUND_PRODUCT,high,SPLIT in name
+LCS,0,BROMPTON LIFECO SPLIT CORP. CLASS A,INVESTMENT COMPANY,FUND_PRODUCT,high,SPLIT in name
+SBC,0,BROMPTON SPLIT BANC CORP. CLASS 'A',INVESTMENT COMPANY,FUND_PRODUCT,high,SPLIT in name
+BDB.O,0,BUSINESS DEVELOPMENT BK CDA NSDQ-100 NOTES 1,INVESTMENT COMPANY,FUND_PRODUCT,high,"structured note tracking the NASDAQ-100, issued by BDC -- a derivative/index product, not an operating company"
+CAA,0,CALLINAN ROYALTIES CORPORATION,INVESTMENT COMPANY,REAL_COMPANY,medium,"royalty holding operating company (same class as Franco-Nevada/Freehold), not a pooled fund"
+CEZ,1,CALMENA ENERGY SERVICES INC.,INVESTMENT COMPANY,REAL_COMPANY,high,"an oilfield services operating company, no fund characteristics -- clear business-classification miss"
+XCN.A,0,CAN-BANC NT CORP. CL 'A' CAPITAL,INVESTMENT COMPANY,FUND_PRODUCT,high,NT CORP structured-note pattern + CAPITAL share-class tell
+XCN,0,CAN-BANC NT CORPORATION CAPITAL SHARES,INVESTMENT COMPANY,FUND_PRODUCT,high,NT CORP structured-note pattern
+XCN.E,0,CAN-BANC NT CORPORATION EQUITY DIVIDEND,INVESTMENT COMPANY,FUND_PRODUCT,high,paired EQUITY DIVIDEND share class
+CFC,2,CANADIAN FINANCIAL SERVICES NT CORP. CAPITAL,INVESTMENT COMPANY,FUND_PRODUCT,high,NT CORP structured-note pattern
+IU.P,0,CANADIAN SPLITSHARE CORP. DIV CAPITAL RECEIPT,INVESTMENT COMPANY,FUND_PRODUCT,high,SPLITSHARE in name
+CFS,2,CDN FINANCIALS & UTILITIES SPLIT CORP. CL 'A',INVESTMENT COMPANY,FUND_PRODUCT,high,SPLIT in name
+CDI.A,0,CDN. DOLLAR INVEST. (BERMUDA) LTD. CL 'A' RV,INVESTMENT COMPANY,UNKNOWN,low,Bermuda-domiciled investment vehicle -- couldn't confirm identity; RV suffix (restricted voting) is neutral. Flag for manual research before deciding
+CDI.B,0,CDN. DOLLAR INVEST. (BERMUDA) LTD. CL 'B' RV,INVESTMENT COMPANY,UNKNOWN,low,same as CDI.A
+CRP,0,CERES GLOBAL AG CORP.,INVESTMENT COMPANY,REAL_COMPANY,high,"Ceres Global Ag is a real agricultural commodities/grain-handling operating company, not a fund"
+CSH.UN,0,CHARTWELL RETIREMENT RESIDENCES UNITS,INVESTMENT COMPANY,REAL_COMPANY,medium,"Chartwell is a real, large, currently TSX-listed operator of retirement residences -- an operating business organized as an income trust (UN suffix), not a pooled investment fund. Same class as REIT operating companies: real estate operations, not asset management"
+FQC,0,CI MSCI CANADA QUALITY INDEX CLASS ETF SHRS,INVESTMENT COMPANY,FUND_PRODUCT,high,literal ETF in name
+CXC,0,"CIX SPLIT CORP., CLASS 'A'",INVESTMENT COMPANY,FUND_PRODUCT,high,SPLIT in name
+CNF,0,CML GLOBAL CAPITAL LTD.,INVESTMENT COMPANY,UNKNOWN,low,couldn't confirm identity -- flag for manual research
+YCM.X,0,COMMERCE SPLIT CORP. 2010 CL 'A',INVESTMENT COMPANY,FUND_PRODUCT,high,SPLIT in name
+YCM,0,COMMERCE SPLIT CORP. CAPITAL,INVESTMENT COMPANY,FUND_PRODUCT,high,SPLIT in name
+CIR,2,COPERNICAN INT'L FINANCIAL SPLIT CORP. CL A,INVESTMENT COMPANY,FUND_PRODUCT,high,SPLIT in name
+CBW,2,COPERNICAN WORLD BANKS SPLIT INC. CLASS 'A',INVESTMENT COMPANY,FUND_PRODUCT,high,SPLIT in name
+CWO.UN,0,CRS II PREFERRED NT TRUST SENIOR DIVIDEND UN,INVESTMENT COMPANY,FUND_PRODUCT,high,"NT TRUST structured-note pattern, SENIOR DIVIDEND share-class tell"
+CRD,0,CRS PREFERRED NT LTD. SENIOR DIVIDEND,INVESTMENT COMPANY,FUND_PRODUCT,high,NT LTD structured-note pattern
+CYC,0,CYCLICAL SPLIT NT CORP. CAPITAL,INVESTMENT COMPANY,FUND_PRODUCT,high,SPLIT + NT CORP
+CYB,0,CYMBRIA CORPORATION CL 'A' NV,INVESTMENT COMPANY,FUND_PRODUCT,medium,Cymbria is a closed-end investment fund managed by Edgepoint (invests in a portfolio of global equities) -- a pooled vehicle despite the plain CORPORATION name
+DNC,2,DEANS KNIGHT INCOME CORPORATION,INVESTMENT COMPANY,FUND_PRODUCT,medium,"Deans Knight Income Corp is a closed-end fund structure (tax-loss shell later used as an investment fund vehicle) -- pooled vehicle, not an operating business"
+XMI,0,DIVERSIFIED MONTHLY INCOME CORP. MNTH INC DIV,INVESTMENT COMPANY,FUND_PRODUCT,medium,MNTH INC DIV share-class pattern matches split-corp/structured-income-product naming
+PEQ,1,DIVERSIFIED PRIVATE EQUITY CORP. CLASS 'A',INVESTMENT COMPANY,FUND_PRODUCT,medium,"name explicitly describes a pooled private-equity investment vehicle, not an operating company"
+DIV,0,DIVERSIFIED ROYALTY CORP.,INVESTMENT COMPANY,REAL_COMPANY,high,"Diversified Royalty Corp is a real, currently TSX-listed royalty-acquisition operating company (owns royalty streams from Mr. Lube, AIR MILES, etc.) -- same class as Franco-Nevada, not a pooled fund"
+DFN,0,DIVIDEND 15 SPLIT CORP. CL 'A',INVESTMENT COMPANY,FUND_PRODUCT,high,SPLIT in name
+DF,0,DIVIDEND 15 SPLIT CORP. II CLASS 'A',INVESTMENT COMPANY,FUND_PRODUCT,high,SPLIT in name
+DGS,0,DIVIDEND GROWTH SPLIT CORP. CL 'A',INVESTMENT COMPANY,FUND_PRODUCT,high,SPLIT in name
+DS,2,DIVIDEND SELECT 15 CORP. EQUITY,INVESTMENT COMPANY,FUND_PRODUCT,medium,EQUITY share-class tag matches split-corp/structured-product naming family (sibling of DFN/DF above)
+DPM,1,DPM METALS INC.,INVESTMENT COMPANY,UNKNOWN,low,"couldn't confirm identity -- flag for manual research (note: distinct from DPM Metals shares_out top-20 finding, same ticker root but this is usage 1, an older/different entity)"
+DRI,0,DRUG ROYALTY CORPORATION INC.,INVESTMENT COMPANY,REAL_COMPANY,medium,"a royalty-holding operating company (pharma royalty streams), same class as Franco-Nevada, not a pooled fund"
+ERM,0,ECLIPSE RESIDENTIAL MORTGAGE INVEST CORP.,INVESTMENT COMPANY,FUND_PRODUCT,high,user decision: MIC group excluded uniformly (see AI)
+ENF,1,ENBRIDGE INCOME FUND HOLDINGS INC. ORDINARY,INVESTMENT COMPANY,FUND_PRODUCT,high,"literal FUND in name, was the public holding vehicle for Enbridge's income fund interests prior to merger into Enbridge Inc."
+EN,1,ENERGY SPLIT CORP. II INC. CAPITAL YIELD,INVESTMENT COMPANY,FUND_PRODUCT,high,SPLIT in name
+ES,1,ENERGY SPLIT CORP. INC. CAPITAL YIELD,INVESTMENT COMPANY,FUND_PRODUCT,high,SPLIT in name
+EQR,0,EQUITY RESERVE CORP.,INVESTMENT COMPANY,UNKNOWN,low,couldn't confirm identity -- flag for manual research
+EIS,0,EVEREADY INC.,INVESTMENT COMPANY,UNKNOWN,low,couldn't confirm identity (not the battery company) -- flag for manual research
+EIF,0,EXCHANGE INCOME CORPORATION,INVESTMENT COMPANY,REAL_COMPANY,high,"Exchange Income Corp is a real, large, currently TSX-listed diversified operating company (aviation, manufacturing) -- clear business-classification miss"
+FGX,0,FAIRCOURT GOLD INCOME CORP. CLASS 'A',INVESTMENT COMPANY,FUND_PRODUCT,high,Faircourt is a known Canadian closed-end fund sponsor; INCOME CORP share-class structure matches its fund family naming
+FXC,1,FAX CAPITAL CORP. J SV,INVESTMENT COMPANY,UNKNOWN,low,couldn't confirm identity with confidence -- flag for manual research
+FSZ,0,FIERA CAPITAL CORPORATION CLASS 'A' SV,INVESTMENT COMPANY,REAL_COMPANY,high,"Fiera Capital is a real, large, currently TSX-listed independent asset management operating company (like AGF/CI Financial) -- manages funds, is not one"
+FTN,0,FINANCIAL 15 SPLIT CORP. CL 'A',INVESTMENT COMPANY,FUND_PRODUCT,high,SPLIT in name
+CBU,1,FIRST ASSET CANBANC SPLIT CORP. CL 'A',INVESTMENT COMPANY,FUND_PRODUCT,high,SPLIT in name
+TRF.UN,0,FIRST ASSET ENERGY & RESOURCE FUND L.P. UNITS,INVESTMENT COMPANY,FUND_PRODUCT,high,literal FUND + L.P. UNITS
+FNC,0,FOCUS NATIONAL MORTGAGE CORP.,INVESTMENT COMPANY,FUND_PRODUCT,high,user decision: MIC group excluded uniformly (see AI)
+FNV,0,FRANCO-NEVADA CORPORATION,INVESTMENT COMPANY,REAL_COMPANY,high,"Franco-Nevada is a major, real, TSX/NYSE-listed gold royalty and streaming operating company -- clear business-classification miss"
+FRU,0,FREEHOLD ROYALTIES LTD.,INVESTMENT COMPANY,REAL_COMPANY,high,"Freehold Royalties is a real, currently TSX-listed oil & gas royalty operating company -- clear business-classification miss"
+MLP,1,FRONT STREET U.S. MLP INCM FND LTD EQTY SER C,INVESTMENT COMPANY,FUND_PRODUCT,high,literal FND (FUND) in name
+GFC.UN,0,GERMANY FUND OF CANADA (THE) TRUST UNITS,INVESTMENT COMPANY,FUND_PRODUCT,high,literal FUND in name
+GFV,0,GLOBAL 45 SPLIT CORP. CL 'A',INVESTMENT COMPANY,FUND_PRODUCT,high,SPLIT in name
+GDV,1,GLOBAL DIVIDEND GROWTH SPLIT CORP. CL 'A',INVESTMENT COMPANY,FUND_PRODUCT,high,SPLIT in name
+GGF,0,GLOBAL GOVERNMENT PLUS FUND LTD.,INVESTMENT COMPANY,FUND_PRODUCT,high,literal FUND in name
+GRL,2,GLOBAL REAL ESTATE DIVIDEND GROWERS CORP EQTY,INVESTMENT COMPANY,FUND_PRODUCT,medium,EQTY share-class tag matches split-corp/structured-income naming family (sibling of GBF below)
+GSX,1,GLOBAL RESOURCE SPLIT CORP. CL 'A',INVESTMENT COMPANY,FUND_PRODUCT,high,SPLIT in name
+GBF,0,GLOBALANCE DIVIDEND GROWERS CORP. EQUITY,INVESTMENT COMPANY,FUND_PRODUCT,medium,EQUITY share-class tag matches split-corp/structured-income naming family
+GBA,0,GLOBALBANC ADVANTAGED 8 SPLIT CORP CL 'A',INVESTMENT COMPANY,FUND_PRODUCT,high,SPLIT in name
+GP.A,1,GLP NT CORPORATION CL 'A' NV,INVESTMENT COMPANY,FUND_PRODUCT,high,NT CORP structured-note pattern
+GRY.E,0,GRAYSTONE CORPORATION DIVIDEND,INVESTMENT COMPANY,UNKNOWN,low,"share-class suffix (DIVIDEND) suggests split-corp family, but couldn't confirm Graystone's identity with confidence -- flag for manual research"
+GRY.MV.B,0,GRAYSTONE CORPORATION MV,INVESTMENT COMPANY,UNKNOWN,low,same as GRY.E -- flag for manual research
+GRY.SV.A,0,GRAYSTONE CORPORATION SV,INVESTMENT COMPANY,UNKNOWN,low,same as GRY.E -- flag for manual research
+GRO,0,GROWTH INVESTMENT CORP.,INVESTMENT COMPANY,UNKNOWN,low,couldn't confirm identity -- flag for manual research
+HAR,1,HARMONY ASSET LIMITED J,INVESTMENT COMPANY,UNKNOWN,low,couldn't confirm identity -- flag for manual research
+HRW,0,HARROWSTON INC. CL 'A',INVESTMENT COMPANY,UNKNOWN,low,"Harrowston was a Canadian merchant bank/investment holding company (1990s) -- plausibly a real operating company but couldn't confirm with confidence, flag for manual research"
+PAY,0,HIGH INCM PRINCIPAL & YLD SEC. CORP. EQUITY,INVESTMENT COMPANY,FUND_PRODUCT,high,"name explicitly describes a structured income/principal-and-yield security -- a pooled product, not an operating company"
+HEQ,0,HOMEQ CORPORATION,INVESTMENT COMPANY,UNKNOWN,low,"HomEq may relate to a mortgage-servicing business -- couldn't confirm identity/structure with confidence, flag for manual research"
+IAM,0,INTEGRATED ASSET MANAGEMENT CORP.,INVESTMENT COMPANY,REAL_COMPANY,medium,"an asset-management operating company (manages funds, is not one) -- same class as AGF/CI Financial/Fiera"
+JSC,0,JASCAN RESOURCES INC.,INVESTMENT COMPANY,REAL_COMPANY,medium,"name pattern (RESOURCES INC.) matches a junior resource operating company, not a fund"
+JE.UN,0,JUST ENERGY INCOME FUND UNITS,INVESTMENT COMPANY,FUND_PRODUCT,medium,"note: Just Energy itself is a real retail energy operating company, but this specific listing is explicitly the INCOME FUND UNITS structure (pre-conversion income-trust wrapper) -- exclude this listing on the FUND label, distinct from the corporate entity post-conversion"
+KEY,1,KEYERA CORP.,INVESTMENT COMPANY,REAL_COMPANY,high,"Keyera is a real, large, currently TSX-listed midstream energy operating company -- clear business-classification miss"
+KML,0,KINDER MORGAN CANADA LIMITED RV,INVESTMENT COMPANY,REAL_COMPANY,high,"Kinder Morgan Canada was a real, large TSX-listed pipeline operating subsidiary (RV = restricted voting share class) -- not a fund"
+LBS,0,LIFE & BANC SPLIT CORP. CLASS 'A',INVESTMENT COMPANY,FUND_PRODUCT,high,SPLIT in name
+LSC,2,LIFECO SPLIT CORPORATION INC. CL 'A' CAPITAL,INVESTMENT COMPANY,FUND_PRODUCT,high,SPLIT in name
+XMF.A,0,M SPLIT CORP. (2014) CAPITAL,INVESTMENT COMPANY,FUND_PRODUCT,high,SPLIT in name
+MNF,0,MACQUARIE NEXGEN GLOBE INFRASTRUCT CORP. CL A,INVESTMENT COMPANY,FUND_PRODUCT,medium,Macquarie-sponsored infrastructure fund vehicle naming pattern (Macquarie is known for sponsoring closed-end/managed infrastructure funds)
+MPM,0,MARKLAND AGF PRECIOUS METALS CORP. EQUITY NV,INVESTMENT COMPANY,FUND_PRODUCT,medium,"AGF-sponsored (fund manager) precious-metals fund vehicle, EQUITY share-class tag"
+MAR,3,MARRET RESOURCE CORP. J,INVESTMENT COMPANY,FUND_PRODUCT,medium,Marret is a known Canadian credit/high-yield fund manager; this RESOURCE CORP vehicle matches its closed-end fund naming
+MBN,1,MBN CORPORATION EQUITY,INVESTMENT COMPANY,UNKNOWN,low,"EQUITY share-class suffix suggests split-corp family, but couldn't confirm identity with confidence -- flag for manual research"
+MUH.A,0,MCM SPLIT SHARE CORP. CL 'A',INVESTMENT COMPANY,FUND_PRODUCT,high,SPLIT SHARE in name
+MDT,0,MEDNET INTERNATIONAL LTD.,INVESTMENT COMPANY,UNKNOWN,low,couldn't confirm identity -- flag for manual research
+MPI,1,METALS PLUS INCOME CORP. CL 'A',INVESTMENT COMPANY,FUND_PRODUCT,medium,INCOME CORP share-class pattern matches split-corp/structured-product naming family
+MIP,1,MIDDLEFIELD INCOME PLUS II CORP. EQUITY,INVESTMENT COMPANY,FUND_PRODUCT,high,Middlefield is a known Canadian closed-end fund sponsor; INCOME PLUS/EQUITY naming matches its fund family
+XMN,0,MNT LIMITED CAPITAL SHARES,INVESTMENT COMPANY,FUND_PRODUCT,high,CAPITAL SHARES / EQUITY DIVIDEND paired structure (matches XMN.E below) -- split-corp tell
+XMN.E,0,MNT LIMITED EQUITY DIVIDEND,INVESTMENT COMPANY,FUND_PRODUCT,high,paired with XMN CAPITAL SHARES
+MRC,0,MORGUARD CORPORATION,INVESTMENT COMPANY,REAL_COMPANY,high,"Morguard Corporation is a real, large, currently TSX-listed real estate operating and asset management company -- clear business-classification miss"
+MPG,0,MPG INVESTMENT CORP. LTD.,INVESTMENT COMPANY,UNKNOWN,low,couldn't confirm identity -- flag for manual research
+MFU.UN,0,MULTI-FUND INCOME TRUST UNITS,INVESTMENT COMPANY,FUND_PRODUCT,high,literal FUND in name
+SPL.A,0,MULVIHILL PRO-AMS RSP SPLIT SHARE CORP CL 'A',INVESTMENT COMPANY,FUND_PRODUCT,high,"SPLIT SHARE in name, Mulvihill is a known Canadian split-share fund sponsor"
+SPL.B,0,MULVIHILL PRO-AMS RSP SPLIT SHARE CORP CL 'B',INVESTMENT COMPANY,FUND_PRODUCT,high,SPLIT SHARE in name
+NBF,0,NB SPLIT CORP. CLASS 'A' CAPITAL,INVESTMENT COMPANY,FUND_PRODUCT,high,SPLIT in name
+NEW,0,NEWGROWTH CORPORATION CAPITAL SHARES,INVESTMENT COMPANY,FUND_PRODUCT,high,CAPITAL SHARES / EQUITY DIVIDEND paired share-class structure (matches NEW.A/NEW.E)
+NEW.A,0,NEWGROWTH CORPORATION CL 'A' CAPITAL SHARES,INVESTMENT COMPANY,FUND_PRODUCT,high,paired capital-shares class
+NEW.E,0,NEWGROWTH CORPORATION EQUITY DIVIDEND,INVESTMENT COMPANY,FUND_PRODUCT,high,paired equity-dividend class
+NSR,2,NOMAD ROYALTY COMPANY LTD.,INVESTMENT COMPANY,REAL_COMPANY,medium,"a precious-metals royalty/streaming operating company (later merged into Sandstorm Gold), same class as Franco-Nevada, not a pooled fund"
+RF.A,0,NORROCK REALTY FINANCE CORPORATION CL 'A',INVESTMENT COMPANY,FUND_PRODUCT,high,user decision: MIC group excluded uniformly (see AI)
+FFN,0,NORTH AMERICAN FINANCIAL 15 SPLIT CORP CL 'A',INVESTMENT COMPANY,FUND_PRODUCT,high,SPLIT in name
+PWV,0,PACWEST VENTURES LTD.,INVESTMENT COMPANY,UNKNOWN,low,couldn't confirm identity with confidence -- flag for manual research
+PF.A,0,PARAMOUNT FUNDING CORP. CL 'A' RV,INVESTMENT COMPANY,UNKNOWN,low,couldn't confirm identity -- flag for manual research
+PPL,2,PEMBINA PIPELINE CORPORATION,INVESTMENT COMPANY,REAL_COMPANY,high,"Pembina Pipeline is a major, real, currently TSX/NYSE-listed midstream energy operating company -- largest real-company miscategorization found in this set by shares outstanding"
+NSR,1,PREMIER ROYALTY INC. J,INVESTMENT COMPANY,REAL_COMPANY,medium,"royalty-holding operating company (predecessor entity later became Nomad Royalty, ticker NSR usage 1 vs usage 2 above), same class as Franco-Nevada"
+PRH,0,PREMIER UNITED KINGDOM NT (CDN) LTD. SNR DIV,INVESTMENT COMPANY,FUND_PRODUCT,high,"NT (CDN) structured-note pattern, SNR DIV share-class tell"
+PGIC,0,PREMIUM GLOBAL INCOME SPLIT CORP. CLASS A SHR,INVESTMENT COMPANY,FUND_PRODUCT,high,SPLIT in name
+PDV,0,PRIME DIVIDEND CORP. CLASS 'A',INVESTMENT COMPANY,FUND_PRODUCT,medium,DIVIDEND CORP share-class pattern matches split-corp/structured-product naming family
+BIN,0,PROGRESSIVE WASTE SOLUTIONS LTD.,INVESTMENT COMPANY,REAL_COMPANY,high,"Progressive Waste Solutions was a real, large, TSX/NYSE-listed waste management operating company (later merged with Waste Connections) -- clear business-classification miss"
+PDIV,0,PURPOSE ENHANCED DIVIDEND FUND ETF,INVESTMENT COMPANY,FUND_PRODUCT,high,literal ETF and FUND in name
+PYX,0,PYXIS CAPITAL INC.,INVESTMENT COMPANY,UNKNOWN,low,couldn't confirm identity with confidence -- flag for manual research
+PYX.E,0,PYXIS CAPITAL INC. DIVIDEND,INVESTMENT COMPANY,UNKNOWN,low,same as PYX -- flag for manual research
+PYX.A,0,PYXIS CAPITAL INC. NV,INVESTMENT COMPANY,UNKNOWN,low,same as PYX -- flag for manual research
+QRC,1,QUEEN'S ROAD CAPITAL INVESTMENTS LTD. J,INVESTMENT COMPANY,UNKNOWN,low,"couldn't confirm structure with confidence (name suggests an investment holding vehicle, possibly fund-like) -- flag for manual research"
+QI,0,QUORUM GROWTH INC.,INVESTMENT COMPANY,UNKNOWN,low,couldn't confirm identity -- flag for manual research
+RBT,0,R SPLIT II CORP. CAPITAL,INVESTMENT COMPANY,FUND_PRODUCT,high,SPLIT in name
+RBS,1,R SPLIT III CORP. CL 'A' CAPITAL,INVESTMENT COMPANY,FUND_PRODUCT,high,SPLIT in name
+RMI,0,RAMPART MERCANTILE INC. J,INVESTMENT COMPANY,UNKNOWN,low,couldn't confirm identity -- flag for manual research
+RS,1,REAL ESTATE SPLIT CORP. CL A,INVESTMENT COMPANY,FUND_PRODUCT,high,SPLIT in name
+SBN,0,S SPLIT CORP. CLASS 'A',INVESTMENT COMPANY,FUND_PRODUCT,high,SPLIT in name
+STE,1,SANTONIA ENERGY INC. J,INVESTMENT COMPANY,REAL_COMPANY,medium,"name pattern (ENERGY INC.) matches a junior energy operating company, not a fund"
+SKP.UN,0,SASKOIL EQUIPMENT LEASING (1988) LTD. PART UN,INVESTMENT COMPANY,UNKNOWN,low,"an equipment-leasing limited partnership -- could be an operating leasing business or a pooled leasing fund, couldn't confirm with confidence, flag for manual research"
+SMC.M,0,SCOTIA MORTGAGE INVESTMENT CORPORATION BOOMS,INVESTMENT COMPANY,FUND_PRODUCT,high,user decision: MIC group excluded uniformly (see AI)
+PME,1,SENTRY SELECT PRIMARY METALS CORP. CL 'A',INVESTMENT COMPANY,FUND_PRODUCT,high,Sentry Select is a known Canadian closed-end fund sponsor; this CORP vehicle matches its fund family naming
+U,1,SHERRITT POWER CORPORATION,INVESTMENT COMPANY,REAL_COMPANY,medium,"a power-generation operating subsidiary of Sherritt International, not a fund"
+SXT,0,SIXTY SPLIT CORP. CL 'A' CAPITAL,INVESTMENT COMPANY,FUND_PRODUCT,high,SPLIT in name
+SLS,1,SL SPLIT CORP. CLASS 'A' CAPITAL,INVESTMENT COMPANY,FUND_PRODUCT,high,SPLIT in name
+XSN,0,SNT LIMITED CAPITAL SHARES,INVESTMENT COMPANY,FUND_PRODUCT,high,CAPITAL SHARES / EQUITY DIVIDEND paired structure (matches XSN.E) -- split-corp tell
+XSN.E,0,SNT LIMITED EQUITY DIVIDEND,INVESTMENT COMPANY,FUND_PRODUCT,high,paired with XSN CAPITAL SHARES
+MLY,0,SPROTT MOLYBDENUM PARTICIPATION CORPORATION,INVESTMENT COMPANY,FUND_PRODUCT,high,Sprott is a well-known Canadian fund sponsor; a molybdenum PARTICIPATION CORPORATION matches its physical-commodity closed-end fund structure (same design as its well-known physical gold/silver trusts)
+STCK,0,STACK CAPITAL GROUP INC. J,INVESTMENT COMPANY,FUND_PRODUCT,medium,Stack Capital Group is a publicly-traded closed-end-fund-like vehicle holding a portfolio of pre-IPO tech investments -- a pooled investment vehicle despite the operating-company-style name
+SMA,2,STANDARD MERCANTILE ACQUISITION CORP. CL A,INVESTMENT COMPANY,UNKNOWN,low,"an acquisition-vehicle name (possibly a SPAC-like structure) -- couldn't confirm with confidence, flag for manual research"
+XHM.A,0,STAR HEDGE MANAGERS CORP. CL 'A',INVESTMENT COMPANY,FUND_PRODUCT,high,HEDGE MANAGERS CORP name explicitly describes a pooled fund-of-hedge-funds vehicle
+XHG,0,STAR HEDGE MANAGERS CORP. II,INVESTMENT COMPANY,FUND_PRODUCT,high,same vehicle family as XHM.A
+SGB,0,STRATOS GLOBAL CORPORATION,INVESTMENT COMPANY,REAL_COMPANY,medium,"Stratos Global was a real satellite-communications operating company, not a fund"
+SPB,1,SUPERIOR PLUS CORP.,INVESTMENT COMPANY,REAL_COMPANY,high,"Superior Plus is a real, large, currently TSX-listed specialty chemicals/energy distribution operating company -- clear business-classification miss"
+PWI,1,SUSTAINABLE PWR&INFRASTRUCTURE SPLT CORP CL A,INVESTMENT COMPANY,FUND_PRODUCT,high,SPLT (SPLIT) in name
+TBM,0,TBM NT CORP. CAPITAL SHARES,INVESTMENT COMPANY,FUND_PRODUCT,high,NT CORP structured-note pattern + CAPITAL SHARES
+XTD,0,TDB SPLIT CORP. CL A,INVESTMENT COMPANY,FUND_PRODUCT,high,SPLIT in name
+TLD,0,TEL NT LTD. CAPITAL SHARES,INVESTMENT COMPANY,FUND_PRODUCT,high,NT LTD structured-note pattern (paired with TLD.E below)
+TLD.E,0,TEL NT LTD. EQUITY DIVIDEND,INVESTMENT COMPANY,FUND_PRODUCT,high,paired equity-dividend class
+TCL,1,TELECLONE INC. CL 'T',INVESTMENT COMPANY,UNKNOWN,low,couldn't confirm identity -- flag for manual research
+TFS,1,THIRTY-FIVE SPLIT CORP. CL 'A' CAPITAL SHARES,INVESTMENT COMPANY,FUND_PRODUCT,high,SPLIT in name
+TF,0,TIMBERCREEK FINANCIAL CORP.,INVESTMENT COMPANY,FUND_PRODUCT,high,user decision: MIC group excluded uniformly (see AI)
+MTG,1,TIMBERCREEK SR MORTGAGE INVESTMNT CORPORATION,INVESTMENT COMPANY,FUND_PRODUCT,high,user decision: MIC group excluded uniformly (see AI)
+TPZ,0,TOPAZ ENERGY CORP.,INVESTMENT COMPANY,REAL_COMPANY,high,"Topaz Energy is a real, currently TSX-listed energy royalty operating company -- clear business-classification miss"
+TIP,0,TORONTO 35 INDEX PARTICIPATION FUND UNITS,INVESTMENT COMPANY,FUND_PRODUCT,high,"literal FUND in name -- this was Canada's original ETF-precursor product (TIPs, predecessor to iUnits/iShares)"
+TZZ,0,TREZ CAPITAL MORTGAGE INVESTMENT CORP. CL 'A',INVESTMENT COMPANY,FUND_PRODUCT,high,user decision: MIC group excluded uniformly (see AI)
+TCP,0,TRIDENT PERFORMANCE CORP. CL 'A',INVESTMENT COMPANY,FUND_PRODUCT,medium,Trident is a Canadian multi-strategy closed-end fund sponsor; PERFORMANCE CORP vehicle matches its fund family naming
+TCZ,0,TRIDENT PERFORMANCE CORP. II CL A,INVESTMENT COMPANY,FUND_PRODUCT,medium,same vehicle family as TCP
+TMN,1,TRIMIN CAPITAL CORP.,INVESTMENT COMPANY,UNKNOWN,low,couldn't confirm identity -- flag for manual research
+TRM.A,0,TRIMIN ENTERPRISES INC. CL 'A',INVESTMENT COMPANY,UNKNOWN,low,couldn't confirm identity -- flag for manual research
+TRT,1,TRINORTH CAPITAL INC.,INVESTMENT COMPANY,UNKNOWN,low,couldn't confirm identity -- flag for manual research
+US,0,U.S. DIVIDEND GROWERS INCOME CORP. EQUITY,INVESTMENT COMPANY,FUND_PRODUCT,high,INCOME CORP EQUITY share-class pattern matches split-corp/structured-income naming family
+UNC,0,UNITED CORPORATIONS LTD.,INVESTMENT COMPANY,FUND_PRODUCT,medium,United Corporations is one of Canada's oldest closed-end investment funds (dating to 1930s) -- a genuine pooled vehicle despite the plain CORPORATIONS LTD name
+UML,0,URANIUM LIMITED ORDINARY,INVESTMENT COMPANY,UNKNOWN,low,couldn't confirm identity -- flag for manual research
+URC,1,URANIUM ROYALTY CORP. J,INVESTMENT COMPANY,REAL_COMPANY,medium,"a uranium royalty/streaming operating company, same class as Franco-Nevada, not a pooled fund"
+URB,1,URBANA CORPORATION,INVESTMENT COMPANY,FUND_PRODUCT,medium,"Urbana Corporation is a real, currently TSX-listed closed-end investment fund (holds a concentrated portfolio incl. exchange stakes) -- a genuine pooled vehicle despite the plain CORPORATION name"
+URB.A,0,URBANA CORPORATION CLASS 'A' NV,INVESTMENT COMPANY,FUND_PRODUCT,medium,same vehicle as URB
+URF,0,USA REIT FUND LLC,INVESTMENT COMPANY,FUND_PRODUCT,high,"literal FUND in name, and REIT-fund per mandate anyway"
+UTC.A,0,UTILITY CORP. CL 'A',INVESTMENT COMPANY,UNKNOWN,low,couldn't confirm identity -- flag for manual research
+UTC.C,0,UTILITY CORP. CL 'C',INVESTMENT COMPANY,UNKNOWN,low,same as UTC.A -- flag for manual research
+VAL,0,VALUE INVESTMENT CORP.,INVESTMENT COMPANY,UNKNOWN,low,name suggests a pooled investment vehicle but couldn't confirm with confidence -- flag for manual research
+VOXR,0,VOX ROYALTY CORP. J,INVESTMENT COMPANY,REAL_COMPANY,medium,"a currently-listed mining royalty operating company, same class as Franco-Nevada, not a pooled fund"
+WCN,0,"WASTE CONNECTIONS, INC.",INVESTMENT COMPANY,REAL_COMPANY,high,"Waste Connections is a major, real, currently NYSE/TSX-listed waste management operating company -- clear business-classification miss"
+WTE,1,WESTSHORE TERMINALS INVESTMENT CORPORATION,INVESTMENT COMPANY,REAL_COMPANY,medium,"Westshore Terminals is a real, currently TSX-listed coal export terminal operating company (structured as an income-fund-turned-corporation, INVESTMENT CORPORATION is the entity's actual legal name, not a fund product) -- an operating business"
+WCM.A,1,WILMINGTON CAPITAL MANAGEMENT INC. CL 'A' NV,INVESTMENT COMPANY,UNKNOWN,low,couldn't confirm identity with confidence -- flag for manual research
+WCM.B,0,WILMINGTON CAPITAL MANAGEMENT INC. CL 'B',INVESTMENT COMPANY,UNKNOWN,low,same as WCM.A -- flag for manual research
+AGF.B,1,AGF MANAGEMENT LTD. CL 'B' NV,MUTUAL FUNDS,REAL_COMPANY,high,"AGF Management is a real, large, currently TSX-listed independent asset management operating company (manages mutual funds, is not one) -- clear business-classification miss"
+PRM,0,BIG PHARMA SPLIT CORP. CL 'A',MUTUAL FUNDS,FUND_PRODUCT,high,SPLIT in name
+BPF,0,BPI FINANCIAL CORPORATION,MUTUAL FUNDS,REAL_COMPANY,medium,"BPI Financial was a real Canadian mutual fund management company (operating business, later acquired into CI Financial) -- manages funds, is not one"
+BK,0,CANADIAN BANC CORP. CL 'A',MUTUAL FUNDS,FUND_PRODUCT,high,"bank-focused split-share corp -- part of the same 5BANC/ALLBANC/BROMPTON SPLIT BANC family found under INVESTMENT COMPANY, just filed under MUTUAL FUNDS here"
+CGQ,1,CAPITAL GAINS INCOME STREAMS CORP CAP YIELD,MUTUAL FUNDS,FUND_PRODUCT,high,"CAP YIELD share-class tag, INCOME STREAMS CORP structured-product naming"
+CGQ.E,0,CAPITAL GAINS INCOME STREAMS CORP EQUITY DIV,MUTUAL FUNDS,FUND_PRODUCT,high,paired equity-dividend class
+CIX,2,CI FINANCIAL CORP.,MUTUAL FUNDS,REAL_COMPANY,high,"CI Financial is a real, large, currently TSX-listed independent asset management operating company -- manages mutual funds, is not one"
+CTS.UN,0,CRS III DEFERRED PREFERRED TRUST UNITS,MUTUAL FUNDS,FUND_PRODUCT,high,"DEFERRED PREFERRED TRUST UNITS -- structured product, same CRS family as CWO.UN/CRD under INVESTMENT COMPANY"
+ENS,2,E SPLIT CORP. CLASS 'A',MUTUAL FUNDS,FUND_PRODUCT,high,SPLIT in name
+FIP.UN,0,FIDELITY PARTNERSHIP 1993 UNITS,MUTUAL FUNDS,FUND_PRODUCT,high,"Fidelity limited-partnership fund product, UNITS"
+FLP.UN,0,FIDELITY PARTNERSHIP 1994 UNITS,MUTUAL FUNDS,FUND_PRODUCT,high,same Fidelity fund family
+FYP.UN,0,FIDELITY PARTNERSHIP 1995 UNITS,MUTUAL FUNDS,FUND_PRODUCT,high,same Fidelity fund family
+FZP.UN,0,FIDELITY PARTNERSHIP 1996 UNITS,MUTUAL FUNDS,FUND_PRODUCT,high,same Fidelity fund family
+STR,1,FINANCIAL SERVICES INCM STREAMS CORP CAP YLD,MUTUAL FUNDS,FUND_PRODUCT,high,"CAP YLD share-class tag, INCM STREAMS CORP structured-product naming"
+STR.E,0,FINANCIAL SERVICES INCM STREAMS CORP EQTY DIV,MUTUAL FUNDS,FUND_PRODUCT,high,"paired equity-dividend class -- draft tag missed this one, but it's the same vehicle family as STR"
+LPV.UN,0,GLOBAL STRATEGY MASTER LP UNITS,MUTUAL FUNDS,FUND_PRODUCT,high,LP UNITS fund product
+GSP.UN,0,GLOBAL STRATEGY PARTNERSHIP LP III UNITS,MUTUAL FUNDS,FUND_PRODUCT,high,same Global Strategy fund family
+LPS.UN,0,GLOBAL STRATEGY PARTNERSHIP LP VI UNITS,MUTUAL FUNDS,FUND_PRODUCT,high,same Global Strategy fund family
+GCG,0,GUARDIAN CAPITAL GROUP LTD.,MUTUAL FUNDS,REAL_COMPANY,high,"Guardian Capital Group is a real, large, currently TSX-listed independent asset management operating company -- manages funds, is not one"
+GCG.A,1,GUARDIAN CAPITAL GROUP LTD. CL 'A' NV,MUTUAL FUNDS,REAL_COMPANY,high,"same entity as GCG, different share class"
+STQ,0,INCOME STREAMS III CORPORATION CAPITAL YIELD,MUTUAL FUNDS,FUND_PRODUCT,high,"CAPITAL YIELD share-class tag, INCOME STREAMS CORPORATION structured-product naming"
+STQ.E,0,INCOME STREAMS III CORPORATION EQUITY DIV,MUTUAL FUNDS,FUND_PRODUCT,high,paired equity-dividend class
+IVZ,0,INVESCO INC. EXCHANGEABLE,MUTUAL FUNDS,REAL_COMPANY,high,"Invesco is a real, major global asset management operating company -- manages funds, is not one; EXCHANGEABLE denotes a cross-border share mechanic, not a fund wrapper"
+MKZ.UN,0,MACKENZIE MASTER LIMITED PARTNERSHIP UNITS,MUTUAL FUNDS,FUND_PRODUCT,high,LIMITED PARTNERSHIP UNITS fund product sponsored by Mackenzie (a fund manager) -- matches the already-confirmed Mackenzie Master LP false positive found earlier in the LP-name-regex check
+MVX,0,MAVRIX FUND MANAGEMENT INC. J,MUTUAL FUNDS,REAL_COMPANY,high,"Mavrix Fund Management is a real, currently TSX-listed independent asset management operating company -- manages funds, is not one, despite FUND appearing in its corporate name"
+PIC.A,0,PREMIUM INCOME CORPORATION CL 'A',MUTUAL FUNDS,FUND_PRODUCT,high,INCOME CORP share-class pattern matches split-corp/structured-product naming family
+TMF,0,TRIMARK FINANCIAL CORPORATION,MUTUAL FUNDS,REAL_COMPANY,high,"Trimark Financial was a real Canadian mutual fund management operating company (later acquired by AMVESCAP) -- manages funds, is not one"
+FTU,0,US FINANCIAL 15 SPLIT CORP. CLASS 'A',MUTUAL FUNDS,FUND_PRODUCT,high,SPLIT in name
+CNF.UN,0,CANADA INCOME PLUS FUND 1986 TRUST UNITS,TRUST FUND,FUND_PRODUCT,high,literal FUND + TRUST UNITS
+CUF.UN,0,CANADA INCOME PLUS FUND 1987 TRUST UNITS,TRUST FUND,FUND_PRODUCT,high,same fund family as CNF.UN
+CIB.UN,1,CANADA INCOME PLUS FUND TRUST UNITS,TRUST FUND,FUND_PRODUCT,high,same fund family
+CNN.UN,0,CANADA TRUST INCOME INVEST TRUST UNITS,TRUST FUND,FUND_PRODUCT,high,literal TRUST UNITS pooled investment product
+DEQ.UN,0,DIRECT ENERGY TRUST UNITS,TRUST FUND,FUND_PRODUCT,high,user decision: royalty-unit/income-trust group excluded uniformly as trust/fund-wrapper-adjacent
+DVA.UN,0,DRAYTON VALLEY POWER INCOME FUND TRUST UNITS,TRUST FUND,FUND_PRODUCT,medium,"literal FUND + TRUST UNITS, though note this is a power-generation income trust (operating assets held in a trust wrapper) -- same ambiguity class as DEQ.UN, tagged FUND_PRODUCT here for the explicit FUND naming but worth reviewing alongside DEQ.UN/ENP.* as a group"
+ENP.C,0,ENERPLUS RESOURCES CORP. SER 'C' ROYALTY UN,TRUST FUND,FUND_PRODUCT,high,user decision: royalty-unit group excluded uniformly regardless of issuer -- this is a distinct royalty share class from Enerplus's common equity
+ENP.Z,0,ENERPLUS RESOURCES CORP. SER 'D' ROYALTY UN,TRUST FUND,FUND_PRODUCT,high,user decision: royalty-unit group excluded uniformly (see ENP.C)
+ENP.G,0,ENERPLUS RESOURCES CORP. SER 'G' ROYALTY UN,TRUST FUND,FUND_PRODUCT,high,user decision: royalty-unit group excluded uniformly (see ENP.C)
+ENP.B,0,ENERPLUS RESOURCES CORP. SER B ROYALTY UNITS,TRUST FUND,FUND_PRODUCT,high,user decision: royalty-unit group excluded uniformly (see ENP.C)
+FPG.UN,0,FIRST PREMIUM OIL & GAS INCOME TRUST UNITS,TRUST FUND,FUND_PRODUCT,high,user decision: royalty-unit/income-trust group excluded uniformly (see DEQ.UN)
+GIF.UN,1,GAS MANAGEMENT INCOME FUND TRUST UNITS,TRUST FUND,FUND_PRODUCT,medium,"literal FUND + TRUST UNITS, same ambiguity class as the other energy income trusts in this group"
+KMS.UN,0,KMS POWER INCOME FUND TRUST UNITS,TRUST FUND,FUND_PRODUCT,medium,"literal FUND + TRUST UNITS, power-generation income trust, same ambiguity class as DVA.UN"
+LUS.UN,0,LUSCAR COAL INCOME FUND TRUST UNITS,TRUST FUND,FUND_PRODUCT,medium,"literal FUND + TRUST UNITS, coal-mining income trust, same ambiguity class"
+RTP.UN,0,ROYAL TRUST REAL ESTATE LTD. PARTNERSHIP UN J,TRUST FUND,FUND_PRODUCT,high,user decision: royalty-unit/income-trust group excluded uniformly (see DEQ.UN)
+TAY.UN,0,TAYLOR NGL LIMITED PARTNERSHIP UNITS,TRUST FUND,FUND_PRODUCT,high,user decision: royalty-unit/income-trust group excluded uniformly (see DEQ.UN)
+VKR.UN,0,VIKING ENERGY ROYALTY TRUST UNITS,TRUST FUND,FUND_PRODUCT,high,user decision: royalty-unit/income-trust group excluded uniformly (see DEQ.UN)

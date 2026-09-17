@@ -1,0 +1,178 @@
+# Portfolio construction mechanics. See
+# docs/superpowers/specs/2026-09-11-portfolio-config-schema.md
+#
+# SPLIT OF CONCERNS vs config/runs.yaml:
+#   runs.yaml      = WHICH cells exist (the grid). Changes often.
+#   portfolio.yaml = WHAT each mechanism means. Changes rarely.
+#
+# A run names a weighting/leg_scaling by key; this file defines it. That is
+# also what keeps CLAUDE.md's "no magic numbers in src/" true — every
+# window, threshold, weight and shrinkage target a construction routine
+# needs must be readable from here or from the run's own config.
+
+# ---------------------------------------------------------------------------
+# weighting — how names inside a leg are weighted.
+# ---------------------------------------------------------------------------
+weighting_schemes:
+
+  # FP's rank weighting. Names are sorted on ex-ante beta; weight is
+  # proportional to the absolute deviation of a name's beta RANK from the
+  # cross-sectional MEDIAN rank, normalised so each leg sums to 1.
+  # Deliberately not a prose-only description: z is the rank vector at t,
+  # z_bar the median of z, k the normalising constant 2 / sum|z - z_bar|.
+  rank:
+    kind: rank_deviation_from_median
+    normalise_each_leg_to: 1.0
+
+  # Market-cap weighting inside each leg. Uses the SAME lagged-weight
+  # convention as the market index (spec §7): prior day's close × shares
+  # outstanding. Never same-day close, which would be a t+1 read.
+  value:
+    kind: market_cap
+    lag: prior_day_close
+    normalise_each_leg_to: 1.0
+
+# ---------------------------------------------------------------------------
+# leg_scalings — how the long and short legs are sized against each other.
+# ---------------------------------------------------------------------------
+leg_scalings:
+
+  # FP's asymmetric scaling: long leg levered by 1/beta_L, short leg by
+  # 1/beta_H, both ex-ante. This is what makes the portfolio ex-ante
+  # beta-neutral rather than dollar-neutral, and it is why FP's US book
+  # averages ~$1.40 long against ~$0.70 short.
+  #
+  # EX-ANTE IS LOAD-BEARING. beta_L and beta_H are the weighted average
+  # ex-ante betas of each leg, known at formation. Using realized betas
+  # here is a look-ahead bug and is exactly what E3's
+  # test_shuffled_signal_produces_no_alpha exists to catch: a shuffled
+  # signal that still produces alpha means return is coming from
+  # construction rather than from the beta sort.
+  asymmetric_inverse_beta:
+    kind: asymmetric_inverse_beta
+    beta_source: ex_ante
+    # Optional leverage cap. null = uncapped (FP's own convention).
+    # If ever set, record it in the manifest — it changes the result.
+    max_gross_leverage: null
+
+  # Dollar-neutral book plus an explicit market hedge sized by the
+  # portfolio's ex-ante net beta.
+  #
+  # HEDGE INSTRUMENT IS NOT CONFIGURABLE, BY DESIGN. It is always the
+  # run's own `market_index` — the same object the betas were estimated
+  # against. Spec §7: "BAB is market-neutral relative to the index used to
+  # estimate betas — so estimation and evaluation benchmarks must be the
+  # same object, or a non-zero realized loading can't be distinguished
+  # from a bug." Allowing a free hedge_instrument key would let a run
+  # hedge against an index its betas were never estimated against, which
+  # is a known error the schema should not be able to express.
+  dollar_neutral_hedged:
+    kind: dollar_neutral
+    hedge:
+      instrument: market_index   # the run's own — not a free choice
+      ratio: ex_ante_beta
+    normalise_gross_to: 1.0
+
+# ---------------------------------------------------------------------------
+# diagnostics — spec §8: "Monthly logging, every run."
+#
+# NOT CONFIGURABLE AND NOT SWITCHABLE OFF. Diagnostics are how a broken run
+# is caught; a run that can silently omit them is a run whose breakage is
+# invisible. They are listed here for documentation only — the emitting
+# code does not read a toggle from this file, and every run writes all of
+# them to diagnostics.parquet unconditionally.
+# ---------------------------------------------------------------------------
+diagnostics:
+  always_emitted:
+    - realized_market_loading   # near zero, or the estimator is wrong
+    - dollars_long
+    - dollars_short
+    - ex_ante_beta_spread       # beta_H - beta_L at formation
+    - name_count                # per leg
+    - weight_fraction_smallest_size_decile
+
+  # Reference values only — NOT assertions, NOT gates. FP's published US
+  # averages, recorded so a diagnostic can be eyeballed against the paper.
+  # A run that lands far from these is worth investigating; it is not a
+  # test failure, and nothing in src/ should branch on these numbers.
+  fp_reference:
+    us_avg_dollars_long: 1.40
+    us_avg_dollars_short: 0.70
+    source: "Frazzini & Pedersen (2014), US BAB"
+
+# ---------------------------------------------------------------------------
+# rebalance — thresholds for src/portfolio/rebalance.py's monthly loop.
+#
+# A thin universe and an empty leg are DIFFERENT failure modes and must be
+# distinguishable in a skip reason -- min_names_total catches the former,
+# min_names_per_leg the latter (leg_ex_ante_beta already raises ValueError
+# on a truly empty leg; this threshold catches "thin but nonempty" first,
+# with a clearer reason than that exception would give).
+#
+# max_consecutive_skips is a circuit breaker, not a data-quality bound: a
+# handful of thin months at a sample's start is normal (the estimator
+# needs its full rho window to clear before the first beta exists), but a
+# long run of skips means something is broken upstream and the loop
+# should stop rather than silently return a mostly-empty return series.
+# ---------------------------------------------------------------------------
+rebalance:
+  min_names_total: 10
+  min_names_per_leg: 3
+  max_consecutive_skips: 6
+
+# ---------------------------------------------------------------------------
+# monthly_returns — src/data/monthly_returns.py's per-permno arithmetic
+# compounding of daily CRSP returns, for src/portfolio/rebalance.py's
+# monthly_rets input.
+#
+# No delisting_placement key here. An earlier version of this file
+# specified a fold_back/as_stamped choice for CRSP v2's delisting-return
+# rows (dlydelflg == 'Y', stamped 1-4 trading days after a name's last
+# real trade). fold_back reassigned an "orphaned" delisting row (one
+# landing in a later calendar month than the name's last trade) back to
+# that earlier month. THIS WAS WRONG, discovered while smoke-testing
+# Gate 4 (2026-09-13): two real cases -- permno 22518 (2008) and permno
+# 87899 (1995) -- are structurally identical at the daily-panel level
+# (last trade, delisting row exactly one trading day later, crossing a
+# calendar-month boundary) with OPPOSITE correct answers, distinguishable
+# only by a portfolio's own formation calendar. monthly_returns.py has no
+# way to see that calendar, so it cannot make this decision correctly on
+# its own -- see that module's docstring for the full case comparison.
+#
+# Delisting rows now compound exactly where CRSP stamped them, always.
+# The correct handling of an "orphaned" row lives where formation dates
+# already exist: src/portfolio/rebalance.py's missing-coverage skip
+# (built in F2c) excludes a formation date when a weighted name has no
+# real return for its held month, rather than fabricating one -- this
+# already produces the right answer for BOTH named cases above. Gate 4
+# quantifies the resulting skip frequency (by decade, and whether it
+# concentrates in high-beta names) as the measured finding this
+# delisting-placement config was originally meant to produce.
+# ---------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------
+# output — where runs land. See the spec doc's "Output contract" section.
+#
+# Path is the run key VERBATIM: predictable, greppable, matches the YAML,
+# and stable across reruns so Phase H can address a cell by name. The
+# config hash lives INSIDE manifest.json rather than in the path, so a
+# config edit does not churn paths — but a stale result is still
+# detectable by comparing hashes.
+# ---------------------------------------------------------------------------
+output:
+  root: "data/processed/runs"
+  layout: "{root}/{run_key}/"
+  files:
+    returns: returns.parquet          # monthly portfolio returns
+    positions: positions.parquet      # per-name weights at each formation
+    diagnostics: diagnostics.parquet  # the six above, monthly
+    manifest: manifest.json
+  manifest_fields:
+    - run_key
+    - resolved_config      # defaults merged with run overrides, in full
+    - config_sha256        # over resolved_config, canonical JSON
+    - git_sha
+    - generated_at
+    - sample_start
+    - sample_end_resolved  # pins `end: null` to what was actually used
+    - code_version

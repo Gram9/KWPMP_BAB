@@ -1,0 +1,33 @@
+fp_spec:
+  # Volatility window (sigma_i, sigma_m): 1-day log returns.
+  sigma_window_days: 252
+  sigma_min_obs: 120
+  # Correlation window (rho): overlapping 3-day log returns.
+  rho_window_days: 1260
+  rho_min_obs: 750
+  rho_overlap_days: 3
+  # Vasicek shrinkage: beta = shrinkage_weight * beta_raw + (1 - shrinkage_weight) * shrinkage_target
+  shrinkage_weight: 0.6
+  shrinkage_target: 1.0
+
+# D-7 (docs/03_roadmap.md): _load_beta_config(variant) already loads an
+# arbitrary named block from this file -- no code change needed to add a
+# sibling variant.
+#
+# Spec section 8's second grid cell: 12-month daily OLS, same 0.6 shrinkage.
+# Referenced by config/runs.yaml run `ex_microcap_ols`.
+#
+# DECLARED BUT NOT IMPLEMENTED. estimate_ols_12m() is not written. This
+# block exists so that runs naming it pass LOAD-time reference validation
+# and fail at EXECUTE time with a named NotImplementedError, rather than
+# failing as an unresolvable-name typo -- see
+# docs/superpowers/specs/2026-09-11-portfolio-config-schema.md
+# ("Unbuilt references"). Keys are the natural shape for a single-window
+# OLS estimator and may be adjusted when the estimator is actually built;
+# they are not yet a commitment.
+ols_12m:
+  window_days: 252       # single OLS regression window, no split sigma/rho
+  min_obs: 120
+  shrinkage_weight: 0.6
+  shrinkage_target: 1.0
+  implemented: false     # flipped to true when estimate_ols_12m() lands

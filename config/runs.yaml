@@ -1,0 +1,306 @@
+# Portfolio run grid — spec §8's construction grid, expressed as named cells.
+#
+# DESIGN: docs/superpowers/specs/2026-09-11-portfolio-config-schema.md
+# Read that before changing the SHAPE of this file. Adding a cell needs only
+# this file; changing what a key MEANS is a spec change.
+#
+# Three blocks:
+#   defaults:   every key a run needs, with the baseline value.
+#   treatments: named, composable universe restrictions (size/exchange/sector).
+#   runs:       one entry per grid cell. States ONLY what differs from defaults.
+#
+# A run's effective config is `defaults` merged with the run's own keys
+# (shallow, one level, no chaining). `manifest.json` in the output directory
+# records the RESOLVED config, so no reader has to do the merge by hand.
+#
+# NAMES ARE REFERENCES. `estimator: fp_spec` is a key into
+# config/beta_estimator.yaml; `market_index: vw_uncapped` into
+# config/market_index.yaml (not yet written); treatments into the block below.
+# Every reference is validated at LOAD time — a typo fails immediately and
+# cheaply. A reference that resolves but whose implementation does not exist
+# yet raises NotImplementedError at EXECUTE time, per cell. Both are loud;
+# neither is silent.
+
+# ---------------------------------------------------------------------------
+# defaults — the FP baseline convention.
+#
+# NOTE ON SIZE: there is deliberately NO size or liquidity treatment here.
+# Spec §3: "No size or price screen in the base universe — size restrictions
+# are grid cells, not screens." `treatments: []` is the full universe, and
+# any size restriction must be opted into by name. Do not add one here.
+# ---------------------------------------------------------------------------
+defaults:
+  estimator: fp_spec                      # config/beta_estimator.yaml
+  weighting: rank                         # rank | value
+  leg_scaling: asymmetric_inverse_beta    # asymmetric_inverse_beta | dollar_neutral_hedged
+  market_index: vw_uncapped               # config/market_index.yaml
+  treatments: []                          # full universe — see note above
+  formation_lag_days: 0                   # 0 | 1 only. See TIMING below.
+  rebalance: monthly
+
+# ---------------------------------------------------------------------------
+# TIMING — the one rule that overrides everything (CLAUDE.md).
+#
+# Betas are estimated on data through the last trading day of month t−1 and
+# used for positions held in month t. That rule is IN CODE, not in config,
+# and no key here can change it.
+#
+# `formation_lag_days` adds a further backward skip on top of that rule; it
+# can never move the boundary forward. Permitted values are 0 and 1 ONLY —
+# a loader-enforced enum, not a free integer. Any other value (negative,
+# 2, null) is a load-time validation error.
+#
+#   0 = spec §10 baseline: betas through last trading day of t−1.
+#   1 = spec §10 skip-one-day robustness variant: betas through the
+#       SECOND-to-last trading day of t−1, so the closing prices that end
+#       the estimation window do not also produce the first held return.
+#
+# Because the lag is applied after the t−1 month-end rule and is bounded
+# below at 0, no value of this key can express a look-ahead configuration.
+# That is the design constraint: the schema must not be ABLE to express a
+# leaking run, not merely default to a safe one.
+# ---------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------
+# treatments — composable universe restrictions.
+#
+# A treatment is a TREATMENT, not a screen: something whose effect is
+# measured by comparing a run that has it against one that does not. Each
+# entry is an ordered list of filters, applied in order, at date t only.
+# `treatments: [ex_microcap, tsxv_out]` composes both.
+#
+# Every filter is evaluated cross-sectionally at t against data available
+# at t. No filter may reference the full-panel distribution (CLAUDE.md:
+# "no filtering on names with N observations over the full sample").
+# ---------------------------------------------------------------------------
+treatments:
+
+  # --- Size: NOMINAL ---------------------------------------------------
+  # A fixed cap in that leg's own currency, unadjusted for inflation.
+  # HAZARD, stated because it must not be lost: $250M nominal excludes
+  # almost nothing in 1977 and a real slice of the tail in 2026. On the
+  # US-max window (spec §9, ~1965-present) this cell is therefore a
+  # DIFFERENT treatment at each end of the sample. Use ex_microcap_real
+  # when that time-variation would confound the reading.
+  ex_microcap:
+    - kind: min_mkt_cap
+      value: 250.0e6
+      currency: local          # USD for us, CAD for canada (spec §4)
+      basis: nominal
+
+  # --- Size: REAL ------------------------------------------------------
+  # The same economic cutoff at every date. `value` is stated in
+  # `base_year` dollars and deflated back to each formation month via the
+  # leg's CPI series (config/inflation.yaml), so 250M in 2026 dollars
+  # becomes its 2002 / 1985 / 1977 equivalent automatically.
+  #
+  # The deflator is a hard dependency: if config/inflation.yaml's series
+  # does not cover the run's sample window, the run raises
+  # DeflatorCoverageError. It must NEVER silently fall back to nominal —
+  # that would be a different treatment wearing this cell's name.
+  ex_microcap_real:
+    - kind: min_mkt_cap_real
+      value: 250.0e6
+      base_year: 2026
+      deflator: cpi_all_items  # config/inflation.yaml
+      currency: local
+      basis: real
+
+  # --- Size: CROSS-SECTIONAL -------------------------------------------
+  # Percentile and top-N cutoffs are computed on the cross-section AT t.
+  # These need no deflator and carry no nominal-vs-real hazard at all,
+  # because the cutoff is defined by the distribution rather than by a
+  # dollar level. Kept as a distinct `kind` so a reader can never mistake
+  # a cross-sectional cutoff for a pooled dollar one.
+  ex_microcap_pctile:
+    - kind: min_mkt_cap_pctile
+      value: 0.20              # drop smallest 20% by mkt cap at t
+  large_only:
+    - kind: top_n_by_mkt_cap
+      value: 500               # largest 500 names at t
+
+  # --- Exchange (Canada only) ------------------------------------------
+  # Generalises the existing precedent at config/universe.yaml:30-32,
+  # which already defines tsx_only / tsx_and_tsxv as two named cells for
+  # exactly this comparison. Spec §11 Open Item 1 — genuinely open, and
+  # the whole point of having both cells is to answer it empirically.
+  tsxv_out:
+    - kind: exchange_set
+      value: tsx_only          # config/universe.yaml canada_exchange_sets
+      legs: [canada]
+  tsxv_in:
+    - kind: exchange_set
+      value: tsx_and_tsxv
+      legs: [canada]
+
+  # --- Sector neutrality -----------------------------------------------
+  # Spec §11 Open Item 4. Declared so the axis EXISTS and the gap is
+  # visible where a reader would look for it — not omitted, and not
+  # silently skipped.
+  #
+  # US: buildable today. CRSP siccd is on every daily row and varies per
+  # permno through time (spec §11 item 9 addendum), so it is point-in-time.
+  #   NB: siccd, NOT icbindustry. icbindustry is a sector/exposure
+  #   classification that tags CBRE/Zillow as REIT; it is right for sector
+  #   work in principle but has not been confirmed PIT against
+  #   crsp.stknames. siccd is the conservative choice here.
+  #
+  # Canada: NO DATA SOURCE. CHASS's only classification field is
+  # `business-Business`, holding 844 distinct free-text values — not a
+  # taxonomy. `source: null` below is load-bearing: the loader MUST raise
+  # UnavailableTreatmentError naming spec §11 item 4 when a canada run
+  # requests it. A warn-and-skip would emit a result directory labelled
+  # sector-neutral that is not, which is precisely the "wrong number that
+  # looks right" failure CLAUDE.md names as the worst possible outcome.
+  sector_neutral:
+    - kind: sector_neutral
+      scheme: sic_major_group  # 2-digit SIC grouping
+      sources:
+        us: crsp_siccd
+        canada: null           # spec §11 item 4 — unresolved sourcing problem
+
+# ---------------------------------------------------------------------------
+# runs — one entry per grid cell, one leg each.
+#
+# `leg` is a run key, so a cell that means something on both legs is written
+# twice. That keeps one run = one output directory = one row in Phase H's
+# comparison table, and lets each leg carry its own sample window and market
+# index without a nested per-leg override block.
+#
+# The run key IS the output path (data/processed/runs/<run_key>/) and IS the
+# Phase H row label. Treat these keys as stable identifiers: renaming one
+# orphans its results. Add cells freely; rename them rarely.
+# ---------------------------------------------------------------------------
+runs:
+
+  # === The FP baseline — worked example 1 ==============================
+  # FP's headline occupies exactly one cell (spec §8). Every key is a
+  # default except leg and sample, so the block is nearly empty: that
+  # terseness is the point of the defaults block, and the manifest still
+  # records the fully resolved config.
+  fp_baseline_us:
+    leg: us
+    sample: us_max_1965
+
+  fp_baseline_ca:
+    leg: canada
+    sample: common_1977
+    market_index: vw_capped_10pct   # spec §7 — Nortel was ~1/3 of the TSE
+                                    # 300 at its 2000 peak, contaminating
+                                    # every Canadian beta on a 5y window
+                                    # from ~1997-2006.
+
+  # === The acceptance-test cell — worked example 2 =====================
+  # ex_microcap_ols: 12-month OLS estimator + a minimum market cap +
+  # value weighting. This cell did not exist when the schema was designed;
+  # it is here to prove the schema can express a NEW cell cleanly.
+  # Three axes move off baseline at once and the block stays four lines.
+  #
+  # `estimator: ols_12m` resolves against config/beta_estimator.yaml but
+  # estimate_ols_12m() is not written (roadmap D-7), so this run LOADS
+  # clean and RAISES NotImplementedError on execute, naming the estimator.
+  ex_microcap_ols:
+    leg: us
+    sample: us_max_1965
+    estimator: ols_12m
+    weighting: value
+    treatments: [ex_microcap]
+
+  # === Formation-timing robustness (spec §10) ==========================
+  fp_skip1d_us:
+    leg: us
+    sample: us_max_1965
+    formation_lag_days: 1
+
+  # === Weighting axis ==================================================
+  fp_valueweight_us:
+    leg: us
+    sample: us_max_1965
+    weighting: value
+
+  # === Leg-scaling axis ================================================
+  # Hedged against the run's OWN market_index, per spec §7: estimation and
+  # evaluation benchmarks must be the same object, or a non-zero realized
+  # loading cannot be distinguished from a bug. See config/portfolio.yaml.
+  fp_dollarneutral_us:
+    leg: us
+    sample: us_max_1965
+    leg_scaling: dollar_neutral_hedged
+
+  # === Universe axis ===================================================
+  large_only_us:
+    leg: us
+    sample: us_max_1965
+    treatments: [large_only]
+
+  ex_microcap_real_us:
+    leg: us
+    sample: us_max_1965
+    treatments: [ex_microcap_real]
+
+  # === Canada-specific cells (spec §11 items 1 and 4) ==================
+  ca_tsxv_out:
+    leg: canada
+    sample: common_1977
+    market_index: vw_capped_10pct
+    treatments: [tsxv_out]
+
+  ca_tsxv_in:
+    leg: canada
+    sample: common_1977
+    market_index: vw_capped_10pct
+    treatments: [tsxv_in]
+
+  # Composition check: two treatments on different axes, combined.
+  ca_exmicro_tsxv_out:
+    leg: canada
+    sample: common_1977
+    market_index: vw_capped_10pct
+    treatments: [ex_microcap, tsxv_out]
+
+  # Declared deliberately, and expected to RAISE on execute until the
+  # Canadian sector-sourcing problem is solved. It is here so the gap is
+  # visible in the grid rather than absent from it.
+  ca_sector_neutral:
+    leg: canada
+    sample: common_1977
+    market_index: vw_capped_10pct
+    treatments: [sector_neutral]     # -> UnavailableTreatmentError
+
+  us_sector_neutral:
+    leg: us
+    sample: us_max_1965
+    treatments: [sector_neutral]     # buildable — CRSP siccd
+
+  # === Out-of-sample cells (spec §9) ===================================
+  # FP's Canada sample ends Mar 2012, so 2013+ is the genuine
+  # out-of-sample test on that leg.
+  fp_oos_us:
+    leg: us
+    sample: post_2013
+  fp_oos_ca:
+    leg: canada
+    sample: post_2013
+    market_index: vw_capped_10pct
+
+# ---------------------------------------------------------------------------
+# samples — spec §9's three windows, named once.
+#
+# `end: null` means "to the end of available data" and is resolved at run
+# time, then PINNED into the manifest — so a rerun months later is
+# distinguishable from the original rather than silently covering more data.
+# ---------------------------------------------------------------------------
+samples:
+  common_1977:
+    start: "1977-01-01"
+    end: null
+    note: "Headline US-vs-Canada comparison, same period both legs."
+  us_max_1965:
+    start: "1965-01-01"
+    end: null
+    legs: [us]
+    note: "Subperiod stability; deepest AQR overlap. US only."
+  post_2013:
+    start: "2013-01-01"
+    end: null
+    note: "Out-of-sample. FP's Canada sample ends Mar 2012."

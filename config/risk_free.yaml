@@ -1,0 +1,141 @@
+# Risk-free rate sources, per leg. See docs/00_spec.md section 4 (currency)
+# and docs/02_validation_gates.md Gate 4.
+#
+# BAB is built on EXCESS returns and FP's leg scaling depends on them, so a
+# units or convention error here produces a small drift easily misattributed
+# to the strategy (spec section 4's own warning). Correlation-based gates
+# CANNOT detect that class of error -- it is location-invariant. Any check on
+# these series must be absolute, not correlation.
+
+us:
+  # Ken French monthly RF, from the standard 3-factor file.
+  #
+  # UNITS: PERCENT (0.22 == 0.22%/month). Divide by 100 before subtracting
+  # from a decimal return.
+  #
+  # PARSE TRAP: the file contains TWO tables. Monthly data runs from line 5
+  # (header line 4) to line 1205. Line 1206 is blank, line 1207 is
+  # " Annual Factors: January-December ", and the rows after it are keyed by
+  # 4-digit YEAR (1927, 1928, ...). A naive read_csv parses those year keys
+  # as dates and silently appends ANNUAL returns onto the monthly series.
+  # Parsing must stop at the blank line.
+  #
+  # Line 1 of the file documents a mid-series vendor change: the 1-month
+  # T-bill data up to 202405 is from Ibbotson Associates, after which the
+  # source differs. Lands after FP's sample end, recorded for completeness.
+  kind: ken_french_monthly
+  path: "data/raw/ken_french_csvs/F-F_Research_Data_Factors (1).csv"
+  column: "RF"
+  units: percent
+  monthly_header_line: 4      # 0-indexed; data starts at line 5
+  monthly_last_line: 1205     # 0-indexed, inclusive; line 1206 is blank
+  first_month: "192607"
+
+  # Gate 4 ONLY: use AQR's own RF sheet rather than Ken French's.
+  #
+  # Rationale: Gate 4 correlates our BAB series against AQR's published one.
+  # AQR built theirs using this RF, so it is the faithful comparison input.
+  # The two are close but NOT identical -- do not treat them as
+  # interchangeable, and do not use one to validate the other.
+  #
+  # AQR's RF sheet is US Treasury only (stated on the sheet header) and is
+  # therefore of no use to the Canadian leg.
+  gate4_override:
+    kind: aqr_rf_sheet
+    path: "data/raw/AQR_BAB_Historical/Betting Against Beta Equity Factors Monthly.xlsx"
+    sheet: "RF"
+    header_row: 19            # 1-indexed worksheet row; data starts at row 20
+    date_column: "A"
+    value_column: "B"
+    units: decimal
+    first_month: "07/31/1926"
+
+canada:
+  # CHASS ind2, NOT ind1.
+  #
+  # ind2-30 day Return on T-Bills is already a MONTHLY DECIMAL RETURN
+  # (observed range -0.000430 to 0.019110, mean 0.004091) -- directly
+  # subtractable from a monthly equity return, no annualization step.
+  #
+  # ind1-91 Day T-Bill Rate is the ANNUALIZED RATE IN PERCENT (mean 4.99,
+  # max 20.82 in the 1981 spike). It is a different instrument on a
+  # different convention, NOT a substitute: measured corr(ind2, ind1/1200)
+  # = 0.944, not ~1.0, and the gap widens post-2009 (2015-01: ind2
+  # 0.001283 vs ind1/1200 0.000493). Do not use ind1 as the risk-free
+  # series and do not use it to validate ind2.
+  #
+  # Chosen over the Bank of Canada Valet API, which spec section 4 names.
+  # That spec line predates the Canadian leg's pivot from Compustat to
+  # CHASS (spec section 2, merged 2026-09-05) and is stale rather than a
+  # considered rejection of CHASS. Reasons for CHASS: ind2 is already on
+  # the right units/convention; its coverage (1980-01-31 to 2025-12-31,
+  # 552 months) exactly matches the CHASS equity panel's own range, so
+  # BoC's deeper history is unusable anyway; and it is keyed on CHASS's
+  # own REAL trading month-ends (2015-01-30, not calendar 2015-01-31) --
+  # the same date convention gate_adapters.canada_gate1_panel() and
+  # gate1_index.compound_daily_index_to_monthly() already rely on. A
+  # second vendor would reintroduce the month-end alignment trap this
+  # codebase has already hit once.
+  kind: chass_monthly
+  path: "data/raw/CHASS_Data/parquet/monthly.parquet"
+  column: "ind2-30 day Return on T-Bills"
+  units: decimal
+  first_month: "1980-01-31"
+
+  # DERIVED VALUES -- NOT CHASS ind2 OBSERVATIONS.
+  #
+  # ind2 is null for exactly two months, and the two are NOT the same case:
+  #
+  #   2023-10-31: ind2 null AND ind1 null. Nothing in the file to derive
+  #               from -- requires an external rate.
+  #   2023-11-30: ind2 null, but ind1 IS present (5.042). Derivable from
+  #               the file itself.
+  #
+  # Both sit inside the post-publication out-of-sample window
+  # (2013-present), which is the headline Canadian result, so they cannot
+  # be left null to vanish silently in a later dropna.
+  #
+  # User decision 2026-09-08: prefer the file's own ind1 where it exists.
+  # That covers 2023-11-30 only; 2023-10-31 has no ind1 and keeps the
+  # user-supplied external rate. Both entries below record which case they
+  # are via the `basis` field.
+  #
+  # CAVEAT, stated because it must not be lost: an annualized-rate/1200
+  # figure is a PROXY for ind2, not the same series -- this applies to BOTH
+  # entries regardless of whether the rate came from the file or from
+  # outside it. ind2 is a realized 30-day T-bill RETURN; ind1 and the
+  # supplied October figure are both on the 91-day annualized RATE
+  # convention (~12x larger than ind2's band). Measured corr(ind2,
+  # ind1/1200) = 0.944, NOT ~1.0, and the gap widens post-2009. These two
+  # months are therefore an interpolation on a neighbouring convention and
+  # must be reported as such -- never as observed ind2 data.
+  #
+  # Using the file's own ind1 for November is preferable to an external
+  # figure only because it is internally consistent and independently
+  # auditable from this repo, NOT because it is more accurate. Note it
+  # differs from the 5.01% originally supplied for that month (a different
+  # vintage or instrument); the file's value is used.
+  #
+  # Sanity check performed: derived values 0.00410833 and 0.00420167 both
+  # fall inside the surrounding real-data envelope (2023-07 through 2024-02
+  # spans 0.003851 to 0.004222), so neither introduces a visible
+  # discontinuity. That is a plausibility check, NOT evidence of
+  # correctness.
+  #
+  # Any loader reading this file MUST surface these as derived (e.g. an
+  # rf_source column valued "chass" vs "derived_from_ind1" vs
+  # "derived_from_external_rate") so a reader can tell them apart from real
+  # ind2 observations downstream.
+  derived_overrides:
+    - month_end: "2023-10-31"
+      basis: external_rate       # ind1 also null this month -- nothing in-file to use
+      annualized_rate_pct: 4.93
+      value: 0.00410833
+      source: "user-supplied annualized rate / 1200"
+      date_recorded: "2026-09-08"
+    - month_end: "2023-11-30"
+      basis: ind1                # this file's own ind1 cell for this month
+      annualized_rate_pct: 5.042
+      value: 0.00420167
+      source: "CHASS ind1-91 Day T-Bill Rate / 1200"
+      date_recorded: "2026-09-08"

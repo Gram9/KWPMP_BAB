@@ -1,0 +1,154 @@
+# CPI deflators for real-terms market-cap treatments
+# (config/runs.yaml -> treatments.ex_microcap_real, kind: min_mkt_cap_real).
+#
+# ONLY consumer of this file is the real-terms size treatment. Nothing else
+# in the backtest is deflated: returns are nominal throughout, and BAB is a
+# long-short book whose legs share a currency, so a deflator would cancel.
+# Do not widen this file's use without saying so explicitly.
+#
+# BASIS MUST MATCH ACROSS LEGS. Both entries below are HEADLINE all-items,
+# not seasonally adjusted. A core measure on one leg and headline on the
+# other would make a real-terms threshold mean different things in the two
+# countries, sitting unexamined under the project's headline US-vs-Canada
+# comparison. See `rejected_sources` at the bottom — one such file is
+# already in data/raw/ and must not be wired in by mistake.
+#
+# Values verified against the files directly on 2026-09-11 (see the design
+# doc's "CPI source audit"). data/raw/ is immutable — these files are
+# described here as they are, not as they should be.
+
+cpi_all_items:
+
+  canada:
+    # StatCan Table 18-10-0004-01, "All-items" row. THE deflator for the
+    # Canadian leg.
+    path: "data/raw/inflation/1810000401-eng(1).csv"
+    table: "18-10-0004-01"
+    series_row: "All-items"
+    units: index
+    base: "2002=100"
+    adjustment: not_seasonally_adjusted
+    coverage: ["1977-01", "2026-07"]   # 595 monthly values, zero missing
+    first_value: 32.2                  # January 1977
+    last_value: 169.9                  # July 2026
+
+    # PARSE TRAPS — verified, all four bite a naive reader.
+    #
+    # 1. CROSS-TAB LAYOUT, NOT LONG. Rows are product groups (All-items,
+    #    Food, Shelter, Gasoline, ...); COLUMNS are months, as full
+    #    English names ("January 1977"). Must select the All-items row and
+    #    melt. Reading the first data row blindly gets All-items by luck
+    #    today and something else after any StatCan reordering — match the
+    #    row label explicitly.
+    # 2. 7-LINE PREAMBLE plus a "Geography","Canada" line and a
+    #    ,"2002=100" units line before the data. The header row is the one
+    #    beginning "Products and product groups".
+    # 3. UTF-8 BOM on line 1. Read with encoding='utf-8-sig'.
+    # 4. ".." IS A MISSING MARKER, not a number. The All-items row has
+    #    none, but sibling rows (Shelter, Household operations) are ".."
+    #    through 1977-1978. A loader that ever widens beyond All-items
+    #    must treat ".." as null rather than coercing it to 0.
+    #
+    # FOOTNOTE MARKERS: the row label in the file may carry trailing
+    # footnote digits (e.g. "Food 5"). "All-items" itself is clean, but
+    # match defensively rather than on exact equality if this is widened.
+    parse:
+      encoding: utf-8-sig
+      layout: cross_tab_months_as_columns
+      header_startswith: "Products and product groups"
+      row_label: "All-items"
+      missing_marker: ".."
+
+  us:
+    # BLS CPI-U, All Items, not seasonally adjusted.
+    path: "data/raw/inflation/USD.csv"
+    series: "CPI-U All Items"
+    units: index
+    base: "1982-84=100"
+    adjustment: not_seasonally_adjusted
+    coverage: ["1913-01", "2026-08"]
+    # PARSE TRAPS — verified.
+    #
+    # 1. TAB-SEPARATED DESPITE THE .csv EXTENSION. sep='\t'.
+    # 2. WIDE LAYOUT: one row per YEAR, twelve month columns (Jan..Dec),
+    #    then three derived columns — Avg, Dec-Dec, Avg-Avg. The derived
+    #    columns are NOT months and must be dropped before melting, or
+    #    three phantom observations per year enter the series.
+    # 3. MONTH HEADER IS "June"/"July" IN FULL while the others are
+    #    three-letter ("Jan", "Feb", "Mar", ... "Aug"). A strict
+    #    three-letter month parser silently loses June and July.
+    # 4. U+FFFD REPLACEMENT CHARACTERS mark missing cells. Present in the
+    #    1913 percent-change columns AND at a real in-sample point:
+    #    October 2025 reads "� (*)". Must parse to null, never 0.
+    # 5. The final year row is SHORT (2026 has 8 months). Zip month
+    #    columns to values positionally, do not assume 12.
+    parse:
+      separator: "\t"
+      layout: wide_years_x_months
+      drop_columns: ["Avg", "Dec-Dec", "Avg-Avg"]
+      missing_markers: ["�", "� (*)"]
+
+# ---------------------------------------------------------------------------
+# Coverage is a HARD dependency, not a best effort.
+#
+# A real-terms treatment on a run whose sample starts before the deflator's
+# coverage must raise DeflatorCoverageError, naming both windows. It must
+# never fall back to nominal, never extrapolate the index backward, and
+# never silently truncate the sample: each of those yields a result
+# labelled real-terms that is not one.
+#
+# Canadian coverage begins 1977-01, which is exactly spec §9's common
+# window start — so common_1977 is covered exactly, with no margin. A
+# Canadian run starting earlier than 1977-01 cannot use ex_microcap_real.
+# ---------------------------------------------------------------------------
+on_missing_coverage: raise   # raise | (no other value is permitted)
+
+# ---------------------------------------------------------------------------
+# Cross-check, and the two files that must NOT be used as deflators.
+# ---------------------------------------------------------------------------
+cross_check:
+  # Bank of Canada V41690973 "Total CPI" is the SAME headline series as the
+  # StatCan file above, from an independent publisher. It starts 1995-01 so
+  # it cannot be the deflator, but it is an external agreement check: all
+  # three sampled overlap months tie EXACTLY (1995-01 = 86.6,
+  # 2026-06 = 169.0, 2026-07 = 169.9). Two independent sources agreeing on
+  # the same series is a stronger anchor than either alone — and this
+  # project has been bitten twice by statistics that could not see a units
+  # or level error, so an absolute tie-out like this is worth keeping.
+  canada_boc:
+    path: "data/raw/inflation/CPI_MONTHLY.csv"
+    series_id: "V41690973"
+    label: "Total CPI"
+    coverage: ["1995-01", "2026-07"]
+    agrees_with: canada
+    verified_on: "2026-09-11"
+    # Parse note: ~22 lines of preamble/series-dictionary before the
+    # "OBSERVATIONS" line; data begins after it. Column V41690914 is the
+    # SEASONALLY ADJUSTED twin — adjacent in the file and easy to grab by
+    # accident.
+
+rejected_sources:
+  # IN data/raw/ AND WRONG FOR THIS PURPOSE. Named explicitly so it is not
+  # wired in later by someone who sees "CN_CPI" and assumes headline.
+  - path: "data/raw/inflation/CN_CPI.csv"
+    reason: >
+      NOT all-items. Header reads "Consumer Price Index (CPI), all-items
+      excluding eight of the most volatile components as defined by the
+      Bank of Canada" — this is CPIX core, a different basis from the US
+      leg's headline CPI-U. Coverage is deep (1960-01 to 2026-07) which
+      makes it tempting for the pre-1977 window; using it would introduce
+      a core-vs-headline basis mismatch between legs.
+    also: >
+      Two-digit years ("Jan-60" ... "Jul-26"). A naive parser maps Jan-60
+      to 2060 and reverses the series. Requires an explicit century pivot
+      if ever read for any purpose.
+
+  - kind: spliced_series
+    reason: >
+      Chaining CPIX (pre-1995) to Total CPI (1995+) to get 1960-2026 on
+      one Canadian series was considered and REJECTED. It puts a
+      basis change in the middle of the sample — the same structural-break
+      objection spec §9 raises against splicing monthly-estimated betas
+      onto daily-estimated ones. The StatCan All-items file covers
+      1977-01 onward, which is the full common window, so no splice is
+      needed for any sample this project actually runs.

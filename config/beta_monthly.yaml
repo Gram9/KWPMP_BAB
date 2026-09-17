@@ -1,0 +1,41 @@
+# Monthly rolling OLS beta variants, docs/04_handoff_lowbeta_longonly.md
+# Sec 4.2. Genuinely different from config/beta_estimator.yaml's fp_spec/
+# ols_12m blocks: those are DAILY-windowed and feed the (shorted, shrunk)
+# BAB estimator; these are MONTHLY-windowed, UNSHRUNK, and feed the
+# long-only sort. Handoff Sec 3.2 (user-confirmed): sort on RAW beta, not
+# shrunk -- shrinkage is rank-preserving and therefore immaterial to a
+# top-N selection, it only matters for BAB's leg scaling, which this
+# long-only build has no equivalent of. Kept as a separate config file
+# (not appended to beta_estimator.yaml) so a reader never mistakes one
+# family for the other.
+#
+# min_obs is set conservatively relative to window_months: 24m window
+# needs >=16 (67%), 36m window needs >=24 (67%), 60m window needs >=36
+# (60%) -- looser than the daily fp_spec's ratios (sigma: 120/252=48%,
+# rho: 750/1260=60%) because monthly data has far fewer total
+# observations to spare and CHASS's own monthly return column is already
+# ~22% null (docs/01_data_notes.md) -- an overly strict min_obs here
+# would silently exclude a large share of the Canadian universe. Gaps
+# within the window are tolerated (a missing month does not break the
+# window), matching the handoff's explicit tolerance for CHASS's
+# null-return rate.
+#
+# 60m is the DEFAULT/headline variant for the Sec 6 long-only backtest
+# (user-confirmed docs/05_report_spec.md session) -- closer in spirit to
+# FP's own 5-year correlation window, less noisy for picking which
+# specific 20 names to hold for a full quarter. 24m/36m are computed
+# alongside it (not a leakage risk -- each window's OLS input is
+# independently bounded to month <= formation_date, see
+# src/estimation/beta_monthly.py's own docstring) for report Sec 4's
+# robustness check and Sec 8.3's decade-stability discussion.
+window_24m:
+  window_months: 24
+  min_obs: 16
+
+window_36m:
+  window_months: 36
+  min_obs: 24
+
+window_60m:
+  window_months: 60
+  min_obs: 36

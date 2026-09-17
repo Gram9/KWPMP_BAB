@@ -1,0 +1,48 @@
+# Long-only low-beta backtester mechanics, docs/04_handoff_lowbeta_longonly.md.
+#
+# NOT config/portfolio.yaml. That file is BAB-shaped (leg_scalings,
+# asymmetric_inverse_beta, dollar-neutral hedging) -- this build has no
+# legs, no shorting, no leverage (KWPMP is a margin-constrained, long-only
+# investor; see handoff Sec 1). Kept as a separate file so a reader never
+# mistakes one family's config for the other's, the same reasoning
+# config/beta_monthly.yaml gives for staying separate from
+# config/beta_estimator.yaml.
+
+n_holdings: 20  # per leg (20 US + 20 Canadian) -- director's own example
+                # used 16; user-confirmed 20 for this build (handoff Sec 1)
+
+rebalance: quarterly
+
+weighting: equal  # director's spec: "deliberate simplicity" (handoff Sec 1)
+
+# Replace the worst-ranked K names per leg each quarter, buy the
+# best-ranked replacements from the universe. 5 = 25% of 20 holdings,
+# the SAME ratio as the director's own example (4 of 16 = 25%) --
+# user-confirmed this session, not picked independently. A named config
+# key (not hardcoded) so the Sec 8 step 7 turnover-sensitivity sweep is a
+# config change, not a code change.
+turnover_k: 5
+
+# Fringe filters, applied cross-sectionally AT EACH FORMATION DATE
+# (CLAUDE.md: never pooled/full-sample) -- handoff Sec 4.1. Local
+# currency per leg: USD for US, CAD for Canada, matching
+# config/runs.yaml's currency: local convention.
+mkt_cap_floor: 1_000_000_000.0  # $1bn
+price_floor: 1.0                # $1
+
+# Minimum survivors after the fringe filter for a formation date to be
+# usable at all -- below this, the "top 20 of N" selection isn't
+# meaningful (see docs/04_handoff_lowbeta_longonly.md's universe census
+# finding: Canada's own investable universe was 17-37 names pre-1986,
+# which is why the Canada leg's sample starts 1986-01-01 rather than
+# relying on this guard to silently skip those quarters). Kept as a
+# defensive check, not an assumption that it will ever fire in
+# production.
+min_survivors: 20
+
+# Formation timing: beta computed through the last trading day of the
+# month BEFORE the quarter being held (CLAUDE.md's core rule, same
+# discipline as config/portfolio.yaml's rebalance block, extended to
+# quarters via src/portfolio/quarterly.py::next_quarter_end -- never an
+# identity function, see that module's docstring for why this distinction
+# is load-bearing).
